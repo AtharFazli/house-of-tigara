@@ -1,0 +1,362 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { PRODUCTS, formatRupiah, PICKUP_LOCATION } from '../scripts/cart.js';
+
+const IG = 'https://www.instagram.com/houseoftigara/';
+const risol = PRODUCTS[0];
+---
+
+<Layout title="House of Tigara — Market Day Desember 2026">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="wordmark" href="#home">HOUSE OF TIGARA</a>
+      <nav class="header-nav">
+        <a href="#menu" class="nav-link">Menu</a>
+        <a href="#lokasi" class="nav-link">Lokasi</a>
+        <a href="#carapesan" class="nav-link">Cara Pesan</a>
+      </nav>
+      <div class="header-actions">
+        <a href={IG} target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <span class="sr-only">Instagram</span>
+        </a>
+        <button class="btn btn-keranjang" type="button" data-action="cart">
+          Keranjang
+          <span class="badge" data-count-bar>0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="min-h-screen bg-bg">
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="hero-eyebrow">Telkom University Jakarta • Market Day 2026</div>
+          <h1 class="font-display text-3xl text-olive leading-tight hero-title">
+            Kudapan artisanal hangat untuk menemani obrolan berharga Anda.
+          </h1>
+          <p class="text-terracotta text-sm hero-subline">
+            Dikelola oleh mahasiswa Telkom University Jakarta, mempersembahkan kurasi kudapan renyah dan seduhan autentik eksklusif untuk Market Day Desember 2026 di Kampus Stasiun Bumi.
+          </p>
+          <a href="https://wa.me/?text=Halo%20House%20of%20Tigara,%20saya%20ingin%20pre-order%20menu%20Market%20Day" target="_blank" rel="noopener" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path fill="currentColor" d="M12 2a9.8 9.8 0 0 0-8.4 14.85L2.3 22l5.3-1.4A9.9 9.9 0 1 0 12 2Zm0 17.9a8 8 0 0 1-4.1-1.13l-.3-.18-3.15.83.84-3.07-.2-.32A8 8 0 1 1 12 19.9Zm4.4-6c-.24-.12-1.43-.71-1.65-.79-.22-.08-.38-.12-.54.12-.16.24-.62.79-.76.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.95-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.11-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.15 1.51.09.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg>
+            Amankan Pre-Order via WhatsApp
+          </a>
+        </div>
+        <div class="hero-image">
+          <img src="/images/products/risol-4pcs.webp" alt="Risol Mayo" class="hero-photo" width="600" height="450" loading="lazy" />
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="section" id="menu">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">KOLEKSI TERBATAS</span>
+          <h2 class="font-display">Sajian Kurasi Kami</h2>
+        </div>
+        <div class="products">
+          <article class="product">
+            <img src="/images/products/risol-4pcs.webp" alt="Risol Mayo" class="product-img" width="400" height="300" loading="lazy" />
+            <div class="product-copy">
+              <span class="product-badge">Signature Savory</span>
+              <h3>Risol Mayo</h3>
+              <p>Kulit renyah keemasan berpadu smoked beef gurih, telur, dan creamy mayo racikan khas Tigara.</p>
+              <fieldset class="flavor-picker">
+                <legend>Pilih rasa</legend>
+                <label><input type="radio" name="risol-flavor" value="Original" checked /> Original</label>
+                <label><input type="radio" name="risol-flavor" value="Spicy" /> Spicy</label>
+                <label><input type="radio" name="risol-flavor" value="Mix" /> Mix</label>
+              </fieldset>
+              <div class="product-action">
+                <span class="price">{formatRupiah(risol.price)} <small>/ box isi 4</small></span>
+                <button type="button" data-add="risol-mayo">+ Tambah</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="product">
+            <img src="/images/products/coffee-bun.webp" alt="Coffee Bun" class="product-img" width="400" height="300" loading="lazy" />
+            <div class="product-copy">
+              <span class="product-badge">Freshly Baked</span>
+              <h3>Coffee Bun</h3>
+              <p>Roti lembut beraroma kopi pekat dengan lelehan mentega gurih di dalamnya.</p>
+              <div class="product-action">
+                <span class="price">Rp 12.000 <small>/ pcs</small></span>
+                <button type="button" data-add="coffee-bun">+ Tambah</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="product">
+            <img src="/images/products/matcha.webp" alt="Iced Matcha Latte" class="product-img" width="400" height="300" loading="lazy" />
+            <div class="product-copy">
+              <span class="product-badge">Pure Matcha</span>
+              <h3>Iced Matcha Latte</h3>
+              <p>Matcha dengan susu segar dan sirup vanila, disajikan dingin.</p>
+              <div class="product-action">
+                <span class="price">Rp 16.000 <small>/ cup</small></span>
+                <button type="button" data-add="matcha">+ Tambah</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOKASI & WAKTU -->
+    <section class="section" id="lokasi">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Lokasi dan Waktu</span>
+          <h2 class="font-display">Temui Kami di Kampus</h2>
+        </div>
+        <div class="cards grid-3">
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="card-body">
+              <span class="card-title">Lokasi Utama</span>
+              <span class="card-text">Telkom University Jakarta • Kampus Stasiun Bumi • Area Plaza Utama dan Koridor Kreatif Mahasiswa</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div class="card-body">
+              <span class="card-title">Periode Acara</span>
+              <span class="card-text">Desember 2026 • Rangkaian festival kewirausahaan mahasiswa</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </div>
+            <div class="card-body">
+              <span class="card-title">Detail Stan dan Jam</span>
+              <span class="card-text">Tanggal, jam, dan nomor booth: <strong class="text-olive">Menunggu konfirmasi panitia</strong>. Pembeli yang melakukan pre-order akan diinfokan via chat saat nomor booth terbit.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARA PESAN -->
+    <section class="section" id="carapesan">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Alur Pemesanan</span>
+          <h2 class="font-display">Langkah Sederhana Pre-Order</h2>
+        </div>
+        <div class="steps grid-3">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3 class="step-title">Pilih Sajian Favorit</h3>
+              <p class="step-desc">Tentukan jumlah Risol Mayo, Coffee Bun, atau Iced Matcha Latte pilihan yang ingin Anda nikmati.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3 class="step-title">Keranjang dan Isi Data</h3>
+              <p class="step-desc">Isi nama lengkap dan nomor WhatsApp pada form check-out, lalu konfirmasi pesanan.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3 class="step-title">Ambil Pesanan di Kampus SB</h3>
+              <p class="step-desc">Tunjukkan bukti konfirmasi pesanan saat di Kampus Stasiun Bumi untuk pengambilan cepat.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRAWER: KERANGKAT (hidden) -->
+    <div class="drawer-overlay" data-drawer-overlay data-action="menu" hidden></div>
+    <div class="drawer" data-drawer hidden>
+      <div class="drawer-head">
+        <h2 class="font-display drawer-title">Keranjang</h2>
+        <button class="drawer-close" type="button" data-action="menu" aria-label="Tutup">✕</button>
+      </div>
+      <p class="text-sm text-brown drawer-count"><span data-count>0</span> item</p>
+      <div class="cart-items" data-cart-items></div>
+      <p class="empty" data-empty>Keranjang masih kosong. Pilih menu dulu.</p>
+      <div class="cart-total">
+        <span>Total</span>
+        <strong data-total>Rp 0</strong>
+      </div>
+      <form class="checkout" data-checkout>
+        <h2 class="font-display">Checkout</h2>
+        <p class="text-xs uppercase tracking-wider text-terracotta">Lengkapi data pembeli</p>
+        <label for="name">Nama lengkap</label>
+        <input name="name" id="name" autocomplete="name" required />
+        <label for="contact">Nomor WhatsApp</label>
+        <input name="contact" type="tel" inputmode="tel" autocomplete="tel" required />
+        <p class="form-error" data-error role="alert"></p>
+        <button class="btn" type="submit" data-submit>Konfirmasi pesanan</button>
+        <button class="btn btn-ghost" type="button" data-action="menu">Kembali ke menu</button>
+      </form>
+    </div>
+
+    <!-- MODAL: KONFIRMASI (hidden) -->
+    <div class="modal-overlay" data-modal-overlay data-action="menu" hidden></div>
+    <div class="modal" data-modal hidden>
+      <div class="modal-close" data-action="menu" aria-label="Tutup">✕</div>
+      <div class="modal-body text-center">
+        <h1 class="font-display text-3xl text-olive">Pesanan dikonfirmasi</h1>
+        <p class="success-icon" aria-hidden="true">✓</p>
+        <p class="order-id" data-order-id>Order #TIG-0000</p>
+        <div class="confirm-summary" data-confirm-items></div>
+        <div class="cart-total">
+          <span>Total</span>
+          <strong data-confirm-total>Rp 0</strong>
+        </div>
+        <p class="modal-note">Tunjukkan kode ini kepada panitia di booth House of Tigara.</p>
+        <a class="btn btn-primary btn-block" href={IG} target="_blank" rel="noopener" data-payment>Bayar via DM Instagram</a>
+        <button class="btn btn-ghost" type="button" data-action="menu">Selesai</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="wordmark" href="#home">House of Tigara</a>
+          <p class="footer-tagline">made for your little cravings.</p>
+        </div>
+        <div class="footer-loc">
+          <span class="footer-loc-text">Telkom University Jakarta • Kampus Stasiun Bumi</span>
+        </div>
+        <div class="footer-meta">
+          <a class="footer-instagram" href={IG} target="_blank" rel="noopener">Instagram · @houseoftigara</a>
+        </div>
+      </div>
+      <div class="footer-copy">
+        <span>© 2026 House of Tigara. Hak cipta dilindungi.</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cart-bar" data-cart-bar hidden>
+    <div class="cart-bar-summary">
+      <span><span data-count-bar>0</span> item</span>
+      <strong data-total-bar>Rp 0</strong>
+    </div>
+    <button class="btn" type="button" data-action="cart">Lihat keranjang</button>
+  </div>
+
+  <script>
+    import { PRODUCTS, PICKUP_LOCATION, addItem, cartCount, cartTotal, formatRupiah, loadCart, saveCart, submitOrder, updateQuantity, validateCheckout } from '../scripts/cart.js';
+
+    const state = { cart: loadCart(localStorage) };
+    const cartItemsEl = document.querySelector('[data-cart-items]');
+    const drawer = document.querySelector('[data-drawer]');
+    const drawerOverlay = document.querySelector('[data-drawer-overlay]');
+    const modal = document.querySelector('[data-modal]');
+    const modalOverlay = document.querySelector('[data-modal-overlay]');
+    const itemLabel = (item) => `${PRODUCTS.find((product) => product.id === item.productId)?.name || item.productId}${item.variant ? ` · ${item.variant}` : ''}`;
+
+    function render() {
+      const count = cartCount(state.cart);
+      const total = cartTotal(state.cart);
+      document.querySelectorAll('[data-count]').forEach((el) => (el.textContent = count));
+      document.querySelectorAll('[data-count-bar]').forEach((el) => (el.textContent = count));
+      document.querySelectorAll('[data-total]').forEach((el) => (el.textContent = formatRupiah(total)));
+      document.querySelectorAll('[data-total-bar]').forEach((el) => (el.textContent = formatRupiah(total)));
+      document.querySelector('[data-cart-bar]').hidden = !count;
+      document.querySelector('[data-empty]').hidden = Boolean(count);
+      document.querySelector('[data-submit]').disabled = !count;
+      cartItemsEl.innerHTML = state.cart.map((item) => {
+        const product = PRODUCTS.find((p) => p.id === item.productId);
+        return `<div class="cart-item"><img src="${product?.image || '/produk/placeholder.png'}" alt="${itemLabel(item)}" width="96" height="96" loading="lazy" /><div class="cart-item-content"><strong>${itemLabel(item)}</strong><span>${formatRupiah(product?.price || 0)}</span><div class="quantity"><button type="button" data-key="${item.key}" data-quantity="${item.quantity - 1}" aria-label="Kurangi ${itemLabel(item)}">−</button><span>${item.quantity}</span><button type="button" data-key="${item.key}" data-quantity="${item.quantity + 1}" aria-label="Tambah ${itemLabel(item)}">+</button><button type="button" data-remove="${item.key}" aria-label="Hapus ${itemLabel(item)}">Hapus</button></div></div></div>`;
+      }).join('');
+    }
+
+    function openDrawer() {
+      drawer.hidden = false;
+      drawerOverlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      drawer.hidden = true;
+      drawerOverlay.hidden = true;
+      document.body.style.overflow = '';
+    }
+    function openModal() {
+      closeDrawer();
+      modal.hidden = false;
+      modalOverlay.hidden = false;
+    }
+    function closeModal() {
+      modal.hidden = true;
+      modalOverlay.hidden = true;
+    }
+
+    document.addEventListener('click', (event) => {
+      const target = event.target;
+      const add = target.closest('[data-add]');
+      const quantity = target.closest('[data-quantity]');
+      const remove = target.closest('[data-remove]');
+      const action = target.closest('[data-action]');
+
+      if (add) {
+        const flavor = add.dataset.add === 'risol-mayo' ? document.querySelector('input[name="risol-flavor"]:checked')?.value : undefined;
+        state.cart = addItem(state.cart, add.dataset.add, flavor);
+        saveCart(localStorage, state.cart);
+        render();
+      }
+      if (quantity) {
+        state.cart = updateQuantity(state.cart, quantity.dataset.key, Number(quantity.dataset.quantity));
+        saveCart(localStorage, state.cart);
+        render();
+      }
+      if (remove) {
+        state.cart = updateQuantity(state.cart, remove.dataset.remove, 0);
+        saveCart(localStorage, state.cart);
+        render();
+      }
+      if (action) {
+        const name = action.dataset.action;
+        if (name === 'cart') openDrawer();
+        if (name === 'menu') { closeDrawer(); closeModal(); }
+      }
+    });
+
+    document.querySelector('[data-checkout]').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const payload = { name: String(form.get('name') || ''), contact: String(form.get('contact') || ''), cart: state.cart };
+      const error = validateCheckout(payload);
+      document.querySelector('[data-error]').textContent = error;
+      if (error) return;
+      const result = await submitOrder(payload);
+      const orderTotal = cartTotal(state.cart);
+      document.querySelector('[data-order-id]').textContent = `Order #${result.orderId}`;
+      document.querySelector('[data-confirm-items]').innerHTML = state.cart.map((item) => {
+        const product = PRODUCTS.find((p) => p.id === item.productId);
+        return `<p>${itemLabel(item)} <span>${formatRupiah(product?.price || 0)}</span></p>`;
+      }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${PICKUP_LOCATION}</p>`;
+      document.querySelector('[data-confirm-total]').textContent = formatRupiah(orderTotal);
+      state.cart = [];
+      saveCart(localStorage, state.cart);
+      event.currentTarget.reset();
+      render();
+      openModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') { closeDrawer(); closeModal(); }
+    });
+
+    render();
+  </script>
+</Layout>

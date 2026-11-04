@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+.astro/
+public/produk/
+lighthouse*.json
+.vercel/
+
+# Agent workspace, including plans; keep task notes outside repo by default.
+.hermes/
+.impeccable/
+
+# OS/editor temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+*.tmp
+*.temp
