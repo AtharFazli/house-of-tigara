@@ -1,6 +1,6 @@
 -- Phase 1 open-anytime replacement patch.
 -- Rebuild SQL order: phase1_orders.sql -> phase1_patch.sql -> phase1_schedule_patch.sql -> phase1_open_anytime_patch.sql.
--- phase1_schedule_patch.sql (file 3) is replaced by phase1_open_anytime_patch.sql (file 4); run file 4 after file 3 for upgrades.
+-- phase1_schedule_patch.sql (file 3) is superseded by phase1_open_anytime_patch.sql (file 4). Run file 4 after file 3 for upgrades.
 -- No RLS policies are created. Safe to rerun; preserves existing order/deadline data.
 
 begin;
