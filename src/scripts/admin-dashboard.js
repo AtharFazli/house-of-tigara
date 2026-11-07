@@ -30,7 +30,7 @@ const QUICK_TRANSITIONS = {
   'siap diambil': 'selesai',
 };
 
-const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null, pending: new Set(), loaded: false };
+const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null, pending: new Set(), loaded: false, seen: new Set(), newIds: new Set() };
 
 const tabsEl = document.querySelector('[data-tabs]');
 const listEl = document.querySelector('[data-list]');
@@ -136,6 +136,8 @@ async function loadList() {
         state.loaded = true;
         state.orders = result.orders ?? [];
         state.counts = result.counts ?? {};
+        state.newIds = new Set(state.orders.filter((order) => !state.seen.has(order.id)).map((order) => order.id));
+        state.orders.forEach((order) => state.seen.add(order.id));
         renderTabs();
         renderList();
         ok = true;
@@ -182,6 +184,8 @@ async function loadRecap() {
 
 function renderTabs() {
   const total = Object.values(state.counts).reduce((sum, count) => sum + count, 0);
+  const waiting = state.counts['menunggu pembayaran'] ?? 0;
+  document.title = `(${waiting}) Admin · House of Tigara`;
   tabsEl.innerHTML = TABS.map((tab) => {
     const active = state.status === tab ? ' active' : '';
     const count = tab === 'semua' ? total : (state.counts[tab] ?? 0);
@@ -204,7 +208,7 @@ function renderList() {
       <button class="admin-order-main" type="button" data-order-id="${escapeHtml(order.id)}">
         <span class="admin-order-total">${formatRupiah(order.total)}</span>
         <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
-        <span class="admin-order-id">${escapeHtml(order.id)} <button class="admin-copy" type="button" data-copy="${escapeHtml(order.id)}" aria-label="Salin Order ID ${escapeHtml(order.id)}">${COPY_ICON}</button></span>
+        <span class="admin-order-id">${escapeHtml(order.id)}${state.newIds.has(order.id) ? ' <span class="admin-order-new">baru</span>' : ''} <button class="admin-copy" type="button" data-copy="${escapeHtml(order.id)}" aria-label="Salin Order ID ${escapeHtml(order.id)}">${COPY_ICON}</button></span>
         <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
         <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
         <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
