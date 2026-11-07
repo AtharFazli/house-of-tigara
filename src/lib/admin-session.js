@@ -48,6 +48,22 @@ export function clearCookie(name, options = {}) {
   return serializeCookie(name, '', { ...options, maxAge: 0 });
 }
 
+// Logout must succeed and clear both cookies even when no session client could
+// be built, so the response is assembled here and the route only supplies it.
+export async function adminLogoutResponse({ cookieHeader = '', session = null, secure = false } = {}) {
+  const cookies = parseCookies(cookieHeader);
+  if (session) {
+    await session.logout({ accessToken: cookies[ADMIN_COOKIE_ACCESS], refreshToken: cookies[ADMIN_COOKIE_REFRESH] });
+  }
+  const headers = new Headers();
+  headers.append('set-cookie', clearCookie(ADMIN_COOKIE_ACCESS, { secure }));
+  headers.append('set-cookie', clearCookie(ADMIN_COOKIE_REFRESH, { secure }));
+  headers.set('content-type', 'application/json; charset=utf-8');
+  headers.set('cache-control', 'no-store');
+  headers.set('x-robots-tag', 'noindex');
+  return new Response(JSON.stringify({ ok: true }), { status: 200, headers });
+}
+
 // Keeps the cookie fresh on every authenticated response, so an admin who is
 // actively working never gets logged out mid-task.
 export function sessionCookieHeaders(session, { secure = false } = {}) {

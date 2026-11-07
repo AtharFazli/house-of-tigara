@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   ADMIN_COOKIE_ACCESS,
   ADMIN_COOKIE_REFRESH,
+  adminLogoutResponse,
   createAdminSession,
   hashEmail,
   hashIp,
@@ -68,6 +69,31 @@ test('cookies round-trip and clear', () => {
   assert.match(serialized, /Max-Age=60/);
   assert.deepEqual(parseCookies('a=b%20c'), { a: 'b c' });
   assert.match(clearCookie('a'), /Max-Age=0/);
+});
+
+test('logout clears both cookies when there is no session client', async () => {
+  const response = await adminLogoutResponse({
+    cookieHeader: `${ADMIN_COOKIE_ACCESS}=at; ${ADMIN_COOKIE_REFRESH}=rt`,
+    session: null,
+  });
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true });
+  const cookies = response.headers.getSetCookie();
+  assert.equal(cookies.length, 2);
+  assert.match(cookies[0], new RegExp(`^${ADMIN_COOKIE_ACCESS}=;`));
+  assert.match(cookies[0], /Max-Age=0/);
+  assert.match(cookies[1], new RegExp(`^${ADMIN_COOKIE_REFRESH}=;`));
+  assert.match(cookies[1], /Max-Age=0/);
+});
+
+test('logout revokes the session when a client is present', async () => {
+  let revoked = null;
+  const response = await adminLogoutResponse({
+    cookieHeader: `${ADMIN_COOKIE_ACCESS}=at; ${ADMIN_COOKIE_REFRESH}=rt`,
+    session: { logout: async (tokens) => { revoked = tokens; } },
+  });
+  assert.deepEqual(revoked, { accessToken: 'at', refreshToken: 'rt' });
+  assert.equal(response.status, 200);
 });
 
 test('hashEmail normalizes and is distinct from hashIp', () => {
