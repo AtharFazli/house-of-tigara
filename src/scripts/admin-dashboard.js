@@ -143,7 +143,10 @@ async function loadList() {
         state.loaded = true;
         state.orders = result.orders ?? [];
         state.counts = result.counts ?? {};
-        state.newIds = new Set(state.orders.filter((order) => !state.seen.has(order.id)).map((order) => order.id));
+        const firstLoad = state.seen.size === 0;
+        state.newIds = firstLoad
+          ? new Set()
+          : new Set(state.orders.filter((order) => !state.seen.has(order.id)).map((order) => order.id));
         state.orders.forEach((order) => state.seen.add(order.id));
         renderTabs();
         renderList();
@@ -291,9 +294,31 @@ function renderDetail() {
   detailEl.scrollIntoView({ block: 'nearest' });
 }
 
+function confirmTransition(label, order) {
+  return new Promise((resolve) => {
+    const overlay = document.querySelector('[data-confirm]');
+    const titleEl = document.querySelector('[data-confirm-title]');
+    const bodyEl = document.querySelector('[data-confirm-body]');
+    const okBtn = document.querySelector('[data-confirm-ok]');
+    const cancelBtn = document.querySelector('[data-confirm-cancel]');
+    if (!overlay) { resolve(false); return; }
+    titleEl.textContent = label;
+    bodyEl.textContent = `Order ${order.id}\n${order.customer_name}\n${formatRupiah(order.total)}`;
+    overlay.hidden = false;
+    const done = (value) => {
+      overlay.hidden = true;
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      resolve(value);
+    };
+    okBtn.onclick = () => done(true);
+    cancelBtn.onclick = () => done(false);
+  });
+}
+
 async function applyTransition(order, toStatus) {
   const label = actionLabel(order.status, toStatus);
-  if (!window.confirm(`${label}?\n\nOrder ${order.id}\n${order.customer_name}\n${formatRupiah(order.total)}`)) return;
+  if (!(await confirmTransition(label, order))) return;
 
   const key = `${order.id}:${toStatus}`;
   if (!guard.begin(key)) return;

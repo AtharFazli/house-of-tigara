@@ -47,6 +47,17 @@ if (!admin) return Astro.redirect('/admin/login');
 
   <div class="admin-toast" data-toast role="status" aria-live="polite" hidden></div>
 
+  <div class="admin-confirm" data-confirm role="dialog" aria-modal="true" aria-labelledby="admin-confirm-title" hidden>
+    <div class="admin-confirm-card">
+      <h2 id="admin-confirm-title" data-confirm-title></h2>
+      <p class="admin-confirm-body" data-confirm-body></p>
+      <div class="admin-confirm-actions">
+        <button class="btn btn-ghost" type="button" data-confirm-cancel>Kembali</button>
+        <button class="btn btn-danger" type="button" data-confirm-ok>Ya, lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     import '../../scripts/admin-dashboard.js';
   </script>
