@@ -693,6 +693,13 @@ body { padding-top: 0; }
 .admin-meta { color: var(--brown); font-size: 12px; }
 .admin-list { display: grid; gap: 8px; }
 .admin-empty { padding: 24px; color: var(--brown); text-align: center; border: 1px dashed var(--beige); border-radius: 10px; }
+.admin-toast { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--olive); color: #fff; font: 600 14px var(--font-body); box-shadow: 0 12px 30px rgba(39,54,33,.25); }
+.admin-toast-success { background: var(--olive); }
+.admin-toast-error { background: var(--terracotta); }
+.admin-toast-info { background: var(--olive-2); color: var(--olive); }
+@media (min-width: 720px) { .admin-toast { left: auto; right: 24px; min-width: 320px; max-width: 420px; } }
+@media (prefers-reduced-motion: no-preference) { .admin-toast { animation: admin-toast-in .18s ease-out; } }
+@keyframes admin-toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .admin-order { padding: 12px 14px; background: #fffdf9; border: 1px solid var(--beige); border-radius: 10px; color: var(--olive); }
 .admin-order-main { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "total badge" "id id" "name name" "time time" "items items"; gap: 1px 12px; width: 100%; padding: 0; text-align: left; background: transparent; border: 0; color: var(--olive); font: 400 14px var(--font-body); cursor: pointer; }
 .admin-order-main:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; border-radius: 6px; }

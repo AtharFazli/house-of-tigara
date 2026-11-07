@@ -30,7 +30,7 @@ const QUICK_TRANSITIONS = {
   'siap diambil': 'selesai',
 };
 
-const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null };
+const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null, pending: new Set() };
 
 const tabsEl = document.querySelector('[data-tabs]');
 const listEl = document.querySelector('[data-list]');
@@ -40,6 +40,19 @@ const searchEl = document.querySelector('[data-search]');
 const countTotalEl = document.querySelector('[data-count-total]');
 const refreshEl = document.querySelector('[data-refresh]');
 const logoutEl = document.querySelector('[data-logout]');
+
+const guard = createActionGuard();
+let toastTimer;
+
+function toast(message, type = 'info') {
+  const el = document.querySelector('[data-toast]');
+  if (!el) return;
+  el.textContent = message;
+  el.className = `admin-toast admin-toast-${type}`;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 3200);
+}
 
 function formatDateTime(value) {
   if (!value) return '-';
@@ -127,6 +140,7 @@ function renderList() {
   listEl.innerHTML = state.orders.map((order) => {
     const stale = isStale(order.created_at);
     const quick = QUICK_TRANSITIONS[order.status];
+    const quickPending = quick ? state.pending.has(`${order.id}:${quick}`) : false;
     return `
     <div class="admin-order${stale ? ' admin-order-stale' : ''}">
       <button class="admin-order-main" type="button" data-order-id="${escapeHtml(order.id)}">
@@ -137,7 +151,7 @@ function renderList() {
         <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
         <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
       </button>
-      ${quick ? `<div class="admin-order-actions"><button class="btn btn-primary" type="button" data-quick="${quick}" data-quick-id="${escapeHtml(order.id)}">${actionLabel(order.status, quick)}</button></div>` : ''}
+      ${quick ? `<div class="admin-order-actions"><button class="btn btn-primary" type="button" data-quick="${quick}" data-quick-id="${escapeHtml(order.id)}"${quickPending ? ' disabled' : ''}>${quickPending ? 'Memproses...' : actionLabel(order.status, quick)}</button></div>` : ''}
     </div>`;
   }).join('');
 }
@@ -186,10 +200,13 @@ function renderDetail() {
       </div>
     </div>
     <div class="admin-actions">
-      ${transitions.map((to) => `
-        <button class="btn ${to === 'batal' ? 'btn-danger' : 'btn-primary'}" type="button" data-transition="${to}">
-          ${actionLabel(order.status, to)}
-        </button>`).join('')}
+      ${transitions.map((to) => {
+        const pending = state.pending.has(`${order.id}:${to}`);
+        return `
+        <button class="btn ${to === 'batal' ? 'btn-danger' : 'btn-primary'}" type="button" data-transition="${to}"${pending ? ' disabled' : ''}>
+          ${pending ? 'Memproses...' : actionLabel(order.status, to)}
+        </button>`;
+      }).join('')}
     </div>
     <div class="admin-history">
       <h3>Riwayat</h3>
@@ -205,23 +222,43 @@ async function applyTransition(order, toStatus) {
   const label = actionLabel(order.status, toStatus);
   if (!window.confirm(`${label}?\n\nOrder ${order.id}\n${order.customer_name}\n${formatRupiah(order.total)}`)) return;
 
-  const response = await api(`/api/admin/orders/${encodeURIComponent(order.id)}/status`, {
-    method: 'POST',
-    body: JSON.stringify({ from_status: order.status, to_status: toStatus }),
-  });
-  if (!response) return;
+  const key = `${order.id}:${toStatus}`;
+  if (!guard.begin(key)) return;
+  state.pending.add(key);
+  renderList();
+  if (state.detail) renderDetail();
+
+  let response = null;
+  try {
+    response = await api(`/api/admin/orders/${encodeURIComponent(order.id)}/status`, {
+      method: 'POST',
+      body: JSON.stringify({ from_status: order.status, to_status: toStatus }),
+    });
+  } catch {
+    response = null;
+  }
+
+  state.pending.delete(key);
+  guard.end(key);
+
+  if (!response) {
+    toast('Gagal menghubungi server.', 'error');
+    return;
+  }
   const result = await response.json().catch(() => ({}));
 
   if (response.status === 409 || result.changed === false) {
-    window.alert('Status sudah berubah. Data dimuat ulang.');
+    toast(result.error || 'Status sudah berubah. Data dimuat ulang.', 'error');
     await loadList();
     if (state.detail) await openDetail(state.detail.id);
     return;
   }
   if (!response.ok) {
-    window.alert(result.error || 'Gagal mengubah status.');
+    toast(result.error || 'Gagal mengubah status.', 'error');
     return;
   }
+
+  toast(`${label} untuk ${order.id} berhasil.`, 'success');
   await loadList();
   if (state.detail) await openDetail(state.detail.id);
 }

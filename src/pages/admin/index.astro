@@ -41,6 +41,8 @@ if (!admin) return Astro.redirect('/admin/login');
     </section>
   </div>
 
+  <div class="admin-toast" data-toast role="status" aria-live="polite" hidden></div>
+
   <script>
     import '../../scripts/admin-dashboard.js';
   </script>
