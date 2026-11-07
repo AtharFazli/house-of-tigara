@@ -60,4 +60,7 @@ test('formats WhatsApp order message with numbered items and rupiah totals', () 
   ]);
   const subtotal = 1 * 15000 + 2 * 12000 + 1 * 16000;
   assert.ok(message.includes(`*Total: Rp ${subtotal.toLocaleString('id-ID')}*`));
+  assert.ok(message.startsWith('*PRE-ORDER HOUSE OF TIGARA*'));
+  assert.ok(message.includes('\n*Pesanan*\n'));
+  assert.ok(!message.includes('\n\n\n'));
 });
