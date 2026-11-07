@@ -23,7 +23,9 @@ if (!admin) return Astro.redirect('/admin/login');
         </div>
       </header>
 
-      <nav class="admin-tabs" data-tabs aria-label="Filter status"></nav>
+      <div class="admin-tabs-wrap" data-tabs-wrap>
+        <nav class="admin-tabs" data-tabs aria-label="Filter status"></nav>
+      </div>
     </div>
 
     <div class="admin-banner" data-banner role="alert" hidden></div>

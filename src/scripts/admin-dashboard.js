@@ -34,6 +34,7 @@ const QUICK_TRANSITIONS = {
 const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null, pending: new Set(), loaded: false, seen: new Set(), newIds: new Set() };
 
 const tabsEl = document.querySelector('[data-tabs]');
+const tabsWrap = document.querySelector('[data-tabs-wrap]');
 const listEl = document.querySelector('[data-list]');
 const detailEl = document.querySelector('[data-detail]');
 const recapEl = document.querySelector('[data-recap]');
@@ -368,6 +369,15 @@ tabsEl.addEventListener('click', (event) => {
   state.status = tab.dataset.tab === 'semua' ? '' : tab.dataset.tab;
   loadList();
 });
+
+// The edge fade only makes sense while the tabs can still scroll sideways.
+function updateTabFade() {
+  const atEnd = tabsEl.scrollLeft + tabsEl.clientWidth >= tabsEl.scrollWidth - 2;
+  tabsWrap.classList.toggle('admin-tabs-end', atEnd);
+}
+tabsEl.addEventListener('scroll', updateTabFade, { passive: true });
+window.addEventListener('resize', updateTabFade);
+updateTabFade();
 
 listEl.addEventListener('click', (event) => {
   const quick = event.target.closest('[data-quick]');
