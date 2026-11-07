@@ -1,3 +1,6 @@
+-- WARNING: SUPERSEDED by phase1_open_anytime_patch.sql. Do not run this file again on a
+-- database that already applied phase1_open_anytime_patch.sql: it would re-add the dropped
+-- schedule columns and recreate the weekly preorder-window trigger.
 -- Weekly preorder/pickup schedule agreed by the owner.
 -- Run this entire script once in Supabase SQL Editor as project owner; safe to rerun.
 -- Schedule: preorder Thu 00:00 through Fri 23:59:59.999999 WIB; pickup Mon 07:00-11:00 WIB.
