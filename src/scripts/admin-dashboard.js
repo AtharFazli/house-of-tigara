@@ -294,7 +294,7 @@ function renderDetail() {
   detailEl.scrollIntoView({ block: 'nearest' });
 }
 
-function confirmTransition(label, order) {
+function confirmTransition(label, order, toStatus) {
   return new Promise((resolve) => {
     const overlay = document.querySelector('[data-confirm]');
     const titleEl = document.querySelector('[data-confirm-title]');
@@ -302,6 +302,7 @@ function confirmTransition(label, order) {
     const okBtn = document.querySelector('[data-confirm-ok]');
     const cancelBtn = document.querySelector('[data-confirm-cancel]');
     if (!overlay) { resolve(false); return; }
+    overlay.classList.toggle('admin-confirm-danger', toStatus === 'batal');
     titleEl.textContent = label;
     bodyEl.textContent = `Order ${order.id}\n${order.customer_name}\n${formatRupiah(order.total)}`;
     overlay.hidden = false;
@@ -318,7 +319,7 @@ function confirmTransition(label, order) {
 
 async function applyTransition(order, toStatus) {
   const label = actionLabel(order.status, toStatus);
-  if (!(await confirmTransition(label, order))) return;
+  if (!(await confirmTransition(label, order, toStatus))) return;
 
   const key = `${order.id}:${toStatus}`;
   if (!guard.begin(key)) return;
