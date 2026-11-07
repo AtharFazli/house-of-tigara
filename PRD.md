@@ -64,7 +64,7 @@ flowchart LR
 ```
 
 - **Halaman Astro:** menampilkan menu sebagai HTML biasa. Ini membuat halaman cepat terbuka dan hampir tanpa JavaScript (R5).
-- **JavaScript keranjang:** bagian interaktif yang kecil saja, hanya untuk keranjang dan form (R2, R3).
+- **JavaScript keranjang:** bagian interaktif untuk keranjang dan form. Pesanan dikirim ke endpoint server Astro `/api/orders`; secret Supabase hanya dibaca server dari `SUPABASE_URL` dan `SUPABASE_SECRET_KEY` (tanpa prefix `PUBLIC_`). Endpoint memakai Supabase client server-side untuk memanggil RPC `create_order_atomic`.
 - **localStorage:** menyimpan isi keranjang di HP supaya tidak hilang saat sinyal putus atau halaman dimuat ulang (R5).
 - **Database Supabase:** menyimpan pesanan dan bisa dibaca pemilik (R4). Ini usulan karena gratis untuk mulai dan tidak perlu menulis server sendiri.
 - **Halaman admin:** dipakai pemilik melihat dan mengubah status pesanan (R4).

@@ -62,17 +62,17 @@ Display serif is explicitly required by the brief (R6 "huruf serif"), so the tas
 
 ## 7. Technical constraints
 
-- Framework: **Astro** (existing) — do not switch. Static `output: "static"`, server host enabled.
+- **Framework:** Astro (existing) — do not switch. `output: "server"` with the Vercel adapter hosts the order API server-side.
 - Cart/form: vanilla JS inside Astro; no framework added.
 - Cart persistence: `localStorage`, key `cart` → `[{ productId, quantity }]`.
-- Order persistence: Supabase (proposed) — `products`, `orders`, `order_items` (schema in PRD §6). Currently a local stand-in in `cart.js` (`submitOrder` returns a fake `TIG-XXXX`); replace with real insert after backend approval.
-- Hosting: static (Vercel proposed). No Node server needed for the buyer surface.
+- Order persistence: `POST /api/orders` validates server-side payload and calls the atomic Supabase RPC using server-only `SUPABASE_URL` and `SUPABASE_SECRET_KEY`; `ORDER_HASH_SECRET` HMACs rate-limit identifiers.
+- Hosting: Vercel serverless adapter, root repository is Astro project (no Root Directory override).
 - No account, no login, no payment gateway, no points/vouchers, no multilanguage (PRD §2 constraints).
 
 ## 8. Risks and open questions
 
-- `submitOrder` is a **local placeholder**; real send + retry ("Coba kirim lagi") is not implemented until Supabase is configured (R5 + R8).
+- Order submission depends on server runtime environment variables `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and `ORDER_HASH_SECRET`; never expose them with `PUBLIC_` prefixes.
 - QRIS payment method (R8) is unresolved — needs a decision, not a code change.
 - Admin password + status toggle are Phase 3 (owner) — not part of this prototype.
 - `design.md` and `STYLE.md` use different font families (Playfair/Plus vs CaveatBrush/GARA); the web app follows `design.md` (Playfair + Plus Jakarta Sans). Feed-created images follow `STYLE.md`. Reconcile if the brand team requests otherwise.
-- Server-side rendering is not used; `submitOrder`'s `fetch` to Supabase must be called from a client-side script or via a thin API route.
+- The static buyer page calls the server-rendered `/api/orders` endpoint; Supabase credentials remain server-only.
