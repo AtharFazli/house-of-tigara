@@ -7,6 +7,7 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex');
 
 const { admin } = await requireAdmin(Astro.request);
 if (admin) return Astro.redirect('/admin');
+const expired = Astro.url.searchParams.get('expired') === '1';
 ---
 
 <AdminLayout title="Masuk Admin">
@@ -18,7 +19,7 @@ if (admin) return Astro.redirect('/admin');
       <input id="email" name="email" type="email" autocomplete="username" required />
       <label for="secret">Password</label>
       <input id="secret" name="secret" type="password" autocomplete="current-password" required />
-      <p class="admin-error" id="login-error" role="alert"></p>
+      <p class="admin-error" id="login-error" role="alert">{expired ? 'Sesi berakhir, silakan masuk lagi.' : ''}</p>
       <button class="btn btn-primary" type="submit">Masuk</button>
     </form>
   </main>

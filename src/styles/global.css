@@ -693,6 +693,9 @@ body { padding-top: 0; }
 .admin-meta { color: var(--brown); font-size: 12px; }
 .admin-list { display: grid; gap: 8px; }
 .admin-empty { padding: 24px; color: var(--brown); text-align: center; border: 1px dashed var(--beige); border-radius: 10px; }
+.admin-banner { margin-top: 10px; padding: 10px 14px; border-radius: 8px; background: var(--cream-2); color: var(--terracotta); font: 600 13px var(--font-body); }
+.admin-skeleton { height: 108px; border-radius: 10px; background: linear-gradient(90deg, var(--cream) 25%, var(--cream-2) 37%, var(--cream) 63%); background-size: 400% 100%; animation: admin-shimmer 1.4s ease-in-out infinite; }
+@keyframes admin-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 .admin-toast { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--olive); color: #fff; font: 600 14px var(--font-body); box-shadow: 0 12px 30px rgba(39,54,33,.25); }
 .admin-toast-success { background: var(--olive); }
 .admin-toast-error { background: var(--terracotta); }

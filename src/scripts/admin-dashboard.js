@@ -30,7 +30,7 @@ const QUICK_TRANSITIONS = {
   'siap diambil': 'selesai',
 };
 
-const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null, pending: new Set() };
+const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null, pending: new Set(), loaded: false };
 
 const tabsEl = document.querySelector('[data-tabs]');
 const listEl = document.querySelector('[data-list]');
@@ -99,50 +99,85 @@ async function api(path, options = {}) {
   if (response.status === 401) {
     response = await fetch(path, config);
     if (response.status === 401) {
-      window.location.href = '/admin/login';
+      window.location.href = '/admin/login?expired=1';
       return null;
     }
   }
   return response;
 }
 
+function renderSkeleton() {
+  listEl.innerHTML = Array.from({ length: 4 }, () => '<div class="admin-skeleton"></div>').join('');
+}
+
+function showBanner(message) {
+  const el = document.querySelector('[data-banner]');
+  if (!el) return;
+  el.textContent = message;
+  el.hidden = false;
+}
+
+function hideBanner() {
+  const el = document.querySelector('[data-banner]');
+  if (el) el.hidden = true;
+}
+
 async function loadList() {
-  const response = await api('/api/admin/orders', {
-    method: 'POST',
-    body: JSON.stringify({ status: state.status, q: state.q }),
-  });
-  if (!response) return;
-  const result = await response.json().catch(() => null);
-  if (!result) return;
-  state.orders = result.orders ?? [];
-  state.counts = result.counts ?? {};
-  renderTabs();
-  renderList();
+  if (!state.loaded) renderSkeleton();
+  let ok = false;
+  try {
+    const response = await api('/api/admin/orders', {
+      method: 'POST',
+      body: JSON.stringify({ status: state.status, q: state.q }),
+    });
+    if (response) {
+      const result = await response.json().catch(() => null);
+      if (response.ok && result) {
+        state.loaded = true;
+        state.orders = result.orders ?? [];
+        state.counts = result.counts ?? {};
+        renderTabs();
+        renderList();
+        ok = true;
+      }
+    }
+  } catch {
+    ok = false;
+  }
+  if (!ok && !state.loaded) {
+    listEl.innerHTML = '<p class="admin-empty">Gagal memuat order. Periksa koneksi lalu coba lagi.</p>';
+  }
+  return ok;
 }
 
 async function loadRecap() {
-  const response = await api('/api/admin/recap');
-  if (!response) return;
-  const result = await response.json().catch(() => null);
-  if (!result) return;
-  const recap = result.recap;
-  recapEl.innerHTML = `
-    <table class="admin-table">
-      <thead><tr><th>Produk</th><th>Varian</th><th>Pcs</th><th>Rupiah</th></tr></thead>
-      <tbody>
-        ${recap.perProduct.map((row) => `
-          <tr>
-            <td>${escapeHtml(row.product_name)}</td>
-            <td>${escapeHtml(row.variant ?? '-')}</td>
-            <td>${row.quantity}</td>
-            <td>${formatRupiah(row.subtotal)}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
-    <div class="admin-recap-totals">
-      ${Object.entries(recap.perStatus).map(([status, total]) => `
-        <p><span>${status}</span><strong>${formatRupiah(total)}</strong></p>`).join('')}
-    </div>`;
+  try {
+    const response = await api('/api/admin/recap');
+    if (!response) return false;
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result) return false;
+    const recap = result.recap;
+    recapEl.innerHTML = `
+      <table class="admin-table">
+        <thead><tr><th>Produk</th><th>Varian</th><th>Pcs</th><th>Rupiah</th></tr></thead>
+        <tbody>
+          ${recap.perProduct.map((row) => `
+            <tr>
+              <td>${escapeHtml(row.product_name)}</td>
+              <td>${escapeHtml(row.variant ?? '-')}</td>
+              <td>${row.quantity}</td>
+              <td>${formatRupiah(row.subtotal)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="admin-recap-totals">
+        ${Object.entries(recap.perStatus).map(([status, total]) => `
+          <p><span>${status}</span><strong>${formatRupiah(total)}</strong></p>`).join('')}
+      </div>`;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function renderTabs() {
@@ -157,7 +192,7 @@ function renderTabs() {
 function renderList() {
   countTotalEl.textContent = state.orders.length;
   if (!state.orders.length) {
-    listEl.innerHTML = '<p class="admin-empty">Tidak ada order pada tab ini.</p>';
+    listEl.innerHTML = `<p class="admin-empty">${state.status ? `Belum ada order ${state.status}.` : 'Belum ada order.'}</p>`;
     return;
   }
   listEl.innerHTML = state.orders.map((order) => {
@@ -336,7 +371,12 @@ logoutEl.addEventListener('click', async () => {
 });
 
 async function loadAll() {
-  await Promise.all([loadList(), loadRecap()]);
+  const [listOk, recapOk] = await Promise.all([loadList(), loadRecap()]);
+  if (state.loaded && (!listOk || !recapOk)) {
+    showBanner('Gagal memuat, mencoba lagi...');
+  } else {
+    hideBanner();
+  }
   if (state.detail) await openDetail(state.detail.id);
 }
 
