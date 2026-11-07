@@ -54,6 +54,29 @@ function toast(message, type = 'info') {
   toastTimer = setTimeout(() => { el.hidden = true; }, 3200);
 }
 
+const COPY_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+
+async function copyText(value) {
+  try {
+    await navigator.clipboard.writeText(String(value));
+    toast('Tersalin', 'success');
+  } catch {
+    const area = document.createElement('textarea');
+    area.value = String(value);
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try {
+      document.execCommand('copy');
+      toast('Tersalin', 'success');
+    } catch {
+      toast('Gagal menyalin.', 'error');
+    }
+    area.remove();
+  }
+}
+
 function formatDateTime(value) {
   if (!value) return '-';
   const date = new Date(value);
@@ -146,7 +169,7 @@ function renderList() {
       <button class="admin-order-main" type="button" data-order-id="${escapeHtml(order.id)}">
         <span class="admin-order-total">${formatRupiah(order.total)}</span>
         <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
-        <span class="admin-order-id">${escapeHtml(order.id)}</span>
+        <span class="admin-order-id">${escapeHtml(order.id)} <button class="admin-copy" type="button" data-copy="${escapeHtml(order.id)}" aria-label="Salin Order ID ${escapeHtml(order.id)}">${COPY_ICON}</button></span>
         <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
         <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
         <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
@@ -172,7 +195,7 @@ function renderDetail() {
   detailEl.innerHTML = `
     <div class="admin-detail-head">
       <div>
-        <h2>${escapeHtml(order.id)}</h2>
+        <h2 class="admin-detail-title">${escapeHtml(order.id)} <button class="admin-copy" type="button" data-copy="${escapeHtml(order.id)}" aria-label="Salin Order ID">${COPY_ICON}</button></h2>
         <p class="admin-muted">${escapeHtml(order.customer_name)} · ${formatRupiah(order.total)}</p>
       </div>
       <button class="btn btn-ghost" type="button" data-close-detail>Tutup</button>
@@ -195,7 +218,8 @@ function renderDetail() {
         <h3>Info</h3>
         <p class="admin-kv"><span>Dibuat</span><strong>${formatDateTime(order.created_at)}</strong></p>
         <p class="admin-kv"><span>Dibayar</span><strong>${formatDateTime(order.paid_at)}</strong></p>
-        <p class="admin-kv"><span>WhatsApp</span><strong data-contact>${escapeHtml(order.contact)}</strong></p>
+        <p class="admin-kv"><span>Total</span><span class="admin-kv-value"><strong>${formatRupiah(order.total)}</strong><button class="admin-copy" type="button" data-copy="${order.total}" aria-label="Salin nominal total">${COPY_ICON}</button></span></p>
+        <p class="admin-kv"><span>WhatsApp</span><span class="admin-kv-value"><strong data-contact>${escapeHtml(order.contact)}</strong><button class="admin-copy" type="button" data-copy="${escapeHtml(order.contact)}" aria-label="Salin nomor WhatsApp">${COPY_ICON}</button></span></p>
         <a class="btn btn-primary" href="${buildWaLink(order.contact, buildAdminChatMessage({ nama: order.customer_name, orderId: order.id }))}" target="_blank" rel="noopener">Chat pembeli</a>
       </div>
     </div>
@@ -287,8 +311,13 @@ detailEl.addEventListener('click', (event) => {
     state.detail = null;
     return;
   }
+  const copy = event.target.closest('[data-copy]');
+  if (copy) {
+    copyText(copy.dataset.copy);
+    return;
+  }
   const action = event.target.closest('[data-transition]');
-  if (action) applyTransition(state.detail.id, action.dataset.transition);
+  if (action) applyTransition(state.detail, action.dataset.transition);
 });
 
 let searchTimer;

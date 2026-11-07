@@ -713,6 +713,12 @@ body { padding-top: 0; }
 .admin-order-name { grid-area: name; color: var(--brown); }
 .admin-order-time { grid-area: time; color: var(--brown); font-size: 12px; }
 .admin-order-items { grid-area: items; color: var(--brown); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-order-id { display: flex; align-items: center; gap: 2px; }
+.admin-copy { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -10px -12px -10px -4px; padding: 0; border: 0; background: transparent; color: var(--brown); cursor: pointer; }
+.admin-copy:hover { color: var(--olive); }
+.admin-copy:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; border-radius: 6px; }
+.admin-detail-title { display: flex; align-items: center; gap: 4px; }
+.admin-kv-value { display: inline-flex; align-items: center; gap: 2px; }
 .admin-badge { grid-area: badge; align-self: start; padding: 4px 9px; border-radius: 999px; background: var(--cream); color: var(--olive); font-size: 11px; font-weight: 600; white-space: nowrap; }
 .admin-badge-menunggu-pembayaran { background: var(--cream-2); color: var(--terracotta); }
 .admin-badge-sudah-dibayar { background: var(--beige-2); color: var(--olive); }
