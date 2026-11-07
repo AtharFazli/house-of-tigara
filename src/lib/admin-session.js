@@ -43,6 +43,19 @@ export function clearCookie(name, options = {}) {
   return serializeCookie(name, '', { ...options, maxAge: 0 });
 }
 
+// Keeps the cookie fresh on every authenticated response, so an admin who is
+// actively working never gets logged out mid-task.
+export function sessionCookieHeaders(session, { secure = false } = {}) {
+  const headers = new Headers();
+  if (session?.access_token) {
+    headers.append('set-cookie', serializeCookie(ADMIN_COOKIE_ACCESS, session.access_token, { maxAge: ADMIN_SESSION_TTL_SECONDS, secure }));
+  }
+  if (session?.refresh_token) {
+    headers.append('set-cookie', serializeCookie(ADMIN_COOKIE_REFRESH, session.refresh_token, { maxAge: ADMIN_SESSION_TTL_SECONDS, secure }));
+  }
+  return headers;
+}
+
 export function isAllowedOrigin(request) {
   const origin = request.headers.get('origin');
   if (!origin) return true;
