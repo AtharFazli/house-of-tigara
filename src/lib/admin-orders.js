@@ -29,8 +29,16 @@ export async function listOrders(service, { status = '', q = '' } = {}) {
     .limit(200);
   if (status) query = query.eq('status', status);
   if (q) {
-    const term = String(q).replace(/[%,()]/g, ' ').trim();
-    if (term) query = query.or(`id.ilike.%${term}%,customer_name.ilike.%${term}%`);
+    // The term is matched against id, name, and the trailing digits of the
+    // WhatsApp number. contact is never selected, so the full number stays out
+    // of the list response.
+    const term = String(q).replace(/[%,:()'"]/g, ' ').trim();
+    if (term) {
+      const digits = term.replace(/\D/g, '');
+      const parts = [`id.ilike.%${term}%`, `customer_name.ilike.%${term}%`];
+      if (digits.length >= 4) parts.push(`contact.like.%${digits}`);
+      query = query.or(parts.join(','));
+    }
   }
   const { data, error } = await query;
   if (error) throw new Error(error.message);

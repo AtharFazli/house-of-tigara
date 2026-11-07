@@ -15,14 +15,14 @@ import {
 import { assertOrderId, getCounts, getRecap, listOrders, setStatus } from '../src/lib/admin-orders.js';
 
 function fakeService({ rows = [], error = null, rpcResult = { data: null, error: null } } = {}) {
-  const calls = { selects: [], rpcs: [] };
+  const calls = { selects: [], ors: [], rpcs: [] };
   const chain = {
     select: (columns) => { calls.selects.push(columns); return chain; },
     eq: () => chain,
     order: () => chain,
     limit: () => chain,
     in: () => chain,
-    or: () => chain,
+    or: (filter) => { calls.ors.push(filter); return chain; },
     maybeSingle: async () => ({ data: rows[0] ?? null, error }),
     then: (onFulfilled, onRejected) => Promise.resolve({ data: rows, error }).then(onFulfilled, onRejected),
   };
@@ -121,6 +121,20 @@ test('listOrders never selects the WhatsApp number', async () => {
   await listOrders(service, { status: 'menunggu pembayaran', q: 'Ana' });
   assert.equal(service.calls.selects.length, 1);
   assert.equal(/contact/.test(service.calls.selects[0]), false);
+});
+
+test('search matches id, name, and the last four WhatsApp digits', async () => {
+  const digits = fakeService({ rows: [] });
+  await listOrders(digits, { q: '7890' });
+  assert.equal(digits.calls.ors[0], 'id.ilike.%7890%,customer_name.ilike.%7890%,contact.like.%7890');
+
+  const withoutPrefix = fakeService({ rows: [] });
+  await listOrders(withoutPrefix, { q: '0001' });
+  assert.match(withoutPrefix.calls.ors[0], /id\.ilike\.%0001%/);
+
+  const name = fakeService({ rows: [] });
+  await listOrders(name, { q: 'Ana' });
+  assert.equal(name.calls.ors[0], 'id.ilike.%Ana%,customer_name.ilike.%Ana%');
 });
 
 test('getCounts maps one count per status', async () => {
