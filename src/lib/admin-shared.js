@@ -51,3 +51,59 @@ export function escapeHtml(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+const WIB_TZ = 'Asia/Jakarta';
+const WIB_CLOCK = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: WIB_TZ });
+const WIB_DATE = new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short', timeZone: WIB_TZ });
+const WIB_DAY_KEY = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: WIB_TZ });
+
+const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+const STALE_HOURS = 3;
+
+function toDate(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function jakartaClock(value) {
+  const date = toDate(value);
+  return date ? WIB_CLOCK.format(date) : '-';
+}
+
+export function formatRelativeTime(value, now = Date.now()) {
+  const date = toDate(value);
+  if (!date) return '-';
+  const diff = now - date.getTime();
+  if (diff < MINUTE_MS) return 'baru saja';
+  if (diff < HOUR_MS) return `${Math.floor(diff / MINUTE_MS)} menit lalu`;
+  if (WIB_DAY_KEY.format(date) === WIB_DAY_KEY.format(new Date(now))) return `${Math.floor(diff / HOUR_MS)} jam lalu`;
+  if (diff < 2 * DAY_MS) return `kemarin ${jakartaClock(date)}`;
+  if (diff < 7 * DAY_MS) return `${Math.floor(diff / DAY_MS)} hari lalu`;
+  return WIB_DATE.format(date);
+}
+
+export function isStale(value, hours = STALE_HOURS) {
+  const date = toDate(value);
+  if (!date) return false;
+  return Date.now() - date.getTime() > hours * HOUR_MS;
+}
+
+// One entry per in-flight action, so a double tap cannot fire the same
+// transition twice.
+export function createActionGuard() {
+  const busy = new Set();
+  return {
+    isBusy: (key) => busy.has(key),
+    begin(key) {
+      if (busy.has(key)) return false;
+      busy.add(key);
+      return true;
+    },
+    end(key) {
+      busy.delete(key);
+    },
+  };
+}

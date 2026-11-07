@@ -5,7 +5,10 @@ import {
   buildAdminChatMessage,
   buildWaLink,
   canTransition,
+  createActionGuard,
+  formatRelativeTime,
   isOrderOrderId,
+  isStale,
   maskContact,
 } from '../src/lib/admin-shared.js';
 import { assertOrderId, getCounts, getRecap, listOrders, setStatus } from '../src/lib/admin-orders.js';
@@ -52,6 +55,31 @@ test('transition whitelist: one step forward, one step back, cancellations', () 
   assert.equal(canTransition('siap diambil', 'batal'), false);
   assert.equal(canTransition('menunggu pembayaran', 'selesai'), false);
   assert.equal(canTransition('batal', 'menunggu pembayaran'), false);
+});
+
+test('formatRelativeTime renders WIB-relative labels', () => {
+  const now = new Date('2026-11-07T10:00:00+07:00').getTime();
+  assert.equal(formatRelativeTime(new Date(now - 30 * 1000), now), 'baru saja');
+  assert.equal(formatRelativeTime(new Date(now - 5 * 60 * 1000), now), '5 menit lalu');
+  assert.equal(formatRelativeTime(new Date('2026-11-07T08:00:00+07:00'), now), '2 jam lalu');
+  assert.equal(formatRelativeTime(new Date('2026-11-06T14:20:00+07:00'), now), 'kemarin 14.20');
+  assert.equal(formatRelativeTime(new Date('2026-11-05T09:00:00+07:00'), now), '2 hari lalu');
+  assert.equal(formatRelativeTime(null, now), '-');
+});
+
+test('isStale flags orders older than three hours', () => {
+  assert.equal(isStale(new Date(Date.now() - 4 * 3600 * 1000)), true);
+  assert.equal(isStale(new Date(Date.now() - 2 * 3600 * 1000)), false);
+  assert.equal(isStale(null), false);
+});
+
+test('action guard blocks a double tap', () => {
+  const guard = createActionGuard();
+  assert.equal(guard.begin('TIG-0001:sudah dibayar'), true);
+  assert.equal(guard.begin('TIG-0001:sudah dibayar'), false);
+  assert.equal(guard.isBusy('TIG-0001:sudah dibayar'), true);
+  guard.end('TIG-0001:sudah dibayar');
+  assert.equal(guard.begin('TIG-0001:sudah dibayar'), true);
 });
 
 test('maskContact hides the middle digits', () => {

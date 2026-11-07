@@ -4,7 +4,10 @@ import {
   allowedTransitions,
   buildAdminChatMessage,
   buildWaLink,
+  createActionGuard,
   escapeHtml,
+  formatRelativeTime,
+  isStale,
 } from '../lib/admin-shared.js';
 
 const REFRESH_MS = 30000;
@@ -114,13 +117,16 @@ function renderList() {
     listEl.innerHTML = '<p class="admin-empty">Tidak ada order pada tab ini.</p>';
     return;
   }
-  listEl.innerHTML = state.orders.map((order) => `
-    <button class="admin-order" type="button" data-order-id="${escapeHtml(order.id)}">
+  listEl.innerHTML = state.orders.map((order) => {
+    const stale = isStale(order.created_at);
+    return `
+    <button class="admin-order${stale ? ' admin-order-stale' : ''}" type="button" data-order-id="${escapeHtml(order.id)}">
       <span class="admin-order-id">${escapeHtml(order.id)}</span>
       <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
-      <span class="admin-order-meta">${formatRupiah(order.total)} · ${formatDateTime(order.created_at)}</span>
+      <span class="admin-order-meta">${formatRupiah(order.total)} · ${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
       <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
-    </button>`).join('');
+    </button>`;
+  }).join('');
 }
 
 async function openDetail(orderId) {
