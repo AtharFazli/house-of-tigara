@@ -24,6 +24,12 @@ function actionLabel(fromStatus, toStatus) {
   return ACTION_LABELS[toStatus] ?? toStatus;
 }
 
+const QUICK_TRANSITIONS = {
+  'menunggu pembayaran': 'sudah dibayar',
+  'sudah dibayar': 'siap diambil',
+  'siap diambil': 'selesai',
+};
+
 const state = { status: '', q: '', orders: [], counts: {}, detail: null, timer: null };
 
 const tabsEl = document.querySelector('[data-tabs]');
@@ -120,15 +126,19 @@ function renderList() {
   }
   listEl.innerHTML = state.orders.map((order) => {
     const stale = isStale(order.created_at);
+    const quick = QUICK_TRANSITIONS[order.status];
     return `
-    <button class="admin-order${stale ? ' admin-order-stale' : ''}" type="button" data-order-id="${escapeHtml(order.id)}">
-      <span class="admin-order-total">${formatRupiah(order.total)}</span>
-      <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
-      <span class="admin-order-id">${escapeHtml(order.id)}</span>
-      <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
-      <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
-      <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
-    </button>`;
+    <div class="admin-order${stale ? ' admin-order-stale' : ''}">
+      <button class="admin-order-main" type="button" data-order-id="${escapeHtml(order.id)}">
+        <span class="admin-order-total">${formatRupiah(order.total)}</span>
+        <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
+        <span class="admin-order-id">${escapeHtml(order.id)}</span>
+        <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
+        <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
+        <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
+      </button>
+      ${quick ? `<div class="admin-order-actions"><button class="btn btn-primary" type="button" data-quick="${quick}" data-quick-id="${escapeHtml(order.id)}">${actionLabel(order.status, quick)}</button></div>` : ''}
+    </div>`;
   }).join('');
 }
 
@@ -191,11 +201,11 @@ function renderDetail() {
   detailEl.scrollIntoView({ block: 'nearest' });
 }
 
-async function applyTransition(orderId, toStatus) {
-  const order = state.detail;
-  if (toStatus === 'batal' && !window.confirm(`Batalkan order ${orderId}? Tindakan ini tercatat.`)) return;
+async function applyTransition(order, toStatus) {
+  const label = actionLabel(order.status, toStatus);
+  if (!window.confirm(`${label}?\n\nOrder ${order.id}\n${order.customer_name}\n${formatRupiah(order.total)}`)) return;
 
-  const response = await api(`/api/admin/orders/${encodeURIComponent(orderId)}/status`, {
+  const response = await api(`/api/admin/orders/${encodeURIComponent(order.id)}/status`, {
     method: 'POST',
     body: JSON.stringify({ from_status: order.status, to_status: toStatus }),
   });
@@ -205,7 +215,7 @@ async function applyTransition(orderId, toStatus) {
   if (response.status === 409 || result.changed === false) {
     window.alert('Status sudah berubah. Data dimuat ulang.');
     await loadList();
-    await openDetail(orderId);
+    if (state.detail) await openDetail(state.detail.id);
     return;
   }
   if (!response.ok) {
@@ -213,7 +223,7 @@ async function applyTransition(orderId, toStatus) {
     return;
   }
   await loadList();
-  await openDetail(orderId);
+  if (state.detail) await openDetail(state.detail.id);
 }
 
 tabsEl.addEventListener('click', (event) => {
@@ -224,6 +234,12 @@ tabsEl.addEventListener('click', (event) => {
 });
 
 listEl.addEventListener('click', (event) => {
+  const quick = event.target.closest('[data-quick]');
+  if (quick) {
+    const order = state.orders.find((entry) => entry.id === quick.dataset.quickId);
+    if (order) applyTransition(order, quick.dataset.quick);
+    return;
+  }
   const card = event.target.closest('[data-order-id]');
   if (card) openDetail(card.dataset.orderId);
 });

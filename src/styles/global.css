@@ -693,10 +693,14 @@ body { padding-top: 0; }
 .admin-meta { color: var(--brown); font-size: 12px; }
 .admin-list { display: grid; gap: 8px; }
 .admin-empty { padding: 24px; color: var(--brown); text-align: center; border: 1px dashed var(--beige); border-radius: 10px; }
-.admin-order { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "total badge" "id id" "name name" "time time" "items items"; gap: 1px 12px; width: 100%; padding: 12px 14px; text-align: left; background: #fffdf9; border: 1px solid var(--beige); border-radius: 10px; color: var(--olive); font: 400 14px var(--font-body); cursor: pointer; }
+.admin-order { padding: 12px 14px; background: #fffdf9; border: 1px solid var(--beige); border-radius: 10px; color: var(--olive); }
+.admin-order-main { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "total badge" "id id" "name name" "time time" "items items"; gap: 1px 12px; width: 100%; padding: 0; text-align: left; background: transparent; border: 0; color: var(--olive); font: 400 14px var(--font-body); cursor: pointer; }
+.admin-order-main:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; border-radius: 6px; }
 .admin-order:hover { border-color: var(--olive); }
 .admin-order-stale { border-color: var(--terracotta); background: var(--cream); }
 .admin-order-stale-dot { color: var(--terracotta); font-weight: 600; }
+.admin-order-actions { display: flex; gap: 8px; margin-top: 10px; }
+.admin-order-actions .btn { flex: 1; min-height: 44px; }
 .admin-order-total { grid-area: total; font-size: clamp(20px, 5.6vw, 26px); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
 .admin-order-id { grid-area: id; font-weight: 700; letter-spacing: .01em; }
 .admin-order-name { grid-area: name; color: var(--brown); }
@@ -733,6 +737,9 @@ body { padding-top: 0; }
 @media (min-width: 720px) {
   .admin-shell { padding: 24px; }
   .admin-detail-grid { grid-template-columns: 1fr 1fr; }
-  .admin-order { grid-template-columns: auto 1fr auto; grid-template-areas: "total total badge" "id name time" "items items items"; align-items: center; }
+  .admin-order { padding: 16px; }
+  .admin-order-main { grid-template-columns: auto 1fr auto; grid-template-areas: "total total badge" "id name time" "items items items"; align-items: center; }
   .admin-order-total { font-size: 28px; }
+  .admin-order-actions { margin-top: 12px; }
+  .admin-order-actions .btn { flex: 0 0 auto; min-width: 200px; }
 }
