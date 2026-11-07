@@ -82,6 +82,12 @@ test('resolve rejects a request without cookies', async () => {
   assert.equal((await admin.resolve({ cookieHeader: '' })).admin, null);
 });
 
+test('resolve treats a malformed cookie value as no session', async () => {
+  const admin = session({ createClient: stub().createClient, loadAdmin: async () => ({ userId: 'u1', nama: 'Ana' }) });
+  const result = await admin.resolve({ cookieHeader: `${ADMIN_COOKIE_ACCESS}=%` });
+  assert.equal(result.admin, null);
+});
+
 test('resolve rejects a user that is not an active admin', async () => {
   const admin = session({ createClient: stub().createClient, loadAdmin: async () => null });
   assert.equal((await admin.resolve({ cookieHeader: COOKIE })).admin, null);

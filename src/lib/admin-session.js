@@ -28,7 +28,12 @@ export function parseCookies(header) {
     if (index === -1) continue;
     const name = part.slice(0, index).trim();
     if (!name) continue;
-    cookies[name] = decodeURIComponent(part.slice(index + 1).trim());
+    try {
+      cookies[name] = decodeURIComponent(part.slice(index + 1).trim());
+    } catch {
+      // A broken escape means no value, so one bad cookie cannot fail the request.
+      cookies[name] = '';
+    }
   }
   return cookies;
 }
