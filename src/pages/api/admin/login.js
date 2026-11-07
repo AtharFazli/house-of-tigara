@@ -27,6 +27,7 @@ export async function POST({ request, clientAddress }) {
   if (!email || !secretInput) return json({ error: 'Email dan password wajib diisi.' }, 400);
 
   const admin = getAdminSession();
+  if (!admin) return json({ error: 'Layanan admin belum dikonfigurasi.' }, 503);
   const ipHash = hashIp(clientAddress || '', orderHashSecret);
   const emailHash = hashEmail(email, orderHashSecret);
 

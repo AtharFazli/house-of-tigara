@@ -1,0 +1,47 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/admin-runtime.js';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex');
+
+const { admin } = await requireAdmin(Astro.request);
+if (!admin) return Astro.redirect('/admin/login');
+---
+
+<AdminLayout title="Dashboard Admin">
+  <div class="admin-shell">
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <span class="admin-brand">House of Tigara</span>
+        <span class="admin-role">Dashboard Admin</span>
+      </div>
+      <div class="admin-header-right">
+        <span class="admin-name">{admin.nama}</span>
+        <button class="btn btn-ghost" type="button" data-logout>Keluar</button>
+      </div>
+    </header>
+
+    <nav class="admin-tabs" data-tabs aria-label="Filter status"></nav>
+
+    <div class="admin-toolbar">
+      <input class="admin-search" type="search" placeholder="Cari Order ID atau nama" data-search aria-label="Cari order" />
+      <span class="admin-meta"><span data-count-total>0</span> order · refresh otomatis 30 dtk</span>
+      <button class="btn btn-ghost" type="button" data-refresh>Refresh</button>
+    </div>
+
+    <section class="admin-list" data-list aria-live="polite"></section>
+
+    <section class="admin-detail" data-detail hidden></section>
+
+    <section class="admin-recap">
+      <h2>Rekap</h2>
+      <p class="admin-muted">Pcs per produk dan varian untuk order berstatus sudah dibayar, siap diambil, dan selesai.</p>
+      <div data-recap></div>
+    </section>
+  </div>
+
+  <script>
+    import '../../scripts/admin-dashboard.js';
+  </script>
+</AdminLayout>

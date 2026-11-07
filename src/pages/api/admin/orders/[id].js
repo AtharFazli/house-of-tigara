@@ -1,5 +1,5 @@
-import { adminJson, requireAdmin, unauthorized } from '../../../lib/admin-runtime.js';
-import { assertOrderId, getOrderDetail } from '../../../lib/admin-orders.js';
+import { adminJson, requireAdmin, unauthorized } from '../../../../lib/admin-runtime.js';
+import { assertOrderId, getOrderDetail } from '../../../../lib/admin-orders.js';
 
 export const prerender = false;
 

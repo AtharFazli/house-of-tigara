@@ -1,9 +1,12 @@
 import { ORDER_HASH_SECRET, SUPABASE_ANON_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from 'astro:env/server';
-import { createAdminSession } from './admin-session.js';
+import { createAdminSession, sessionCookieHeaders } from './admin-session.js';
 
 export const orderHashSecret = ORDER_HASH_SECRET;
 
 export function getAdminSession() {
+  // Without the public key the admin area degrades to "not signed in" instead
+  // of throwing: pages redirect to /admin/login and APIs answer 401.
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SECRET_KEY) return null;
   return createAdminSession({
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
@@ -17,6 +20,7 @@ export function getAdminSession() {
 // active member of admin_users.
 export async function requireAdmin(request) {
   const session = getAdminSession();
+  if (!session) return { admin: null, session: null, service: null };
   const resolved = await session.resolve({ cookieHeader: request.headers.get('cookie') || '' });
   return { admin: resolved.admin, session: resolved.session, service: session.service };
 }

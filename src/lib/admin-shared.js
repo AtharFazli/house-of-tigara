@@ -42,3 +42,12 @@ export function buildWaLink(contact, message) {
   const number = String(contact ?? '').replace(/[^\d]/g, '');
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
+
+export function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}

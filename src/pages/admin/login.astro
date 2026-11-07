@@ -1,0 +1,50 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/admin-runtime.js';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex');
+
+const { admin } = await requireAdmin(Astro.request);
+if (admin) return Astro.redirect('/admin');
+---
+
+<AdminLayout title="Masuk Admin">
+  <main class="admin-login">
+    <form class="admin-card" id="login-form">
+      <h1>Masuk Admin</h1>
+      <p class="admin-muted">Gunakan email dan password anggota admin.</p>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="username" required />
+      <label for="secret">Password</label>
+      <input id="secret" name="secret" type="password" autocomplete="current-password" required />
+      <p class="admin-error" id="login-error" role="alert"></p>
+      <button class="btn btn-primary" type="submit">Masuk</button>
+    </form>
+  </main>
+
+  <script>
+    const form = document.querySelector('#login-form');
+    const errorEl = document.querySelector('#login-error');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorEl.textContent = '';
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-requested-with': 'xmlhttprequest' },
+          body: JSON.stringify({ email: form.email.value, secret: form.secret.value }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          errorEl.textContent = result.error || 'Gagal masuk.';
+          return;
+        }
+        window.location.href = '/admin';
+      } catch {
+        errorEl.textContent = 'Gagal menghubungi server.';
+      }
+    });
+  </script>
+</AdminLayout>
