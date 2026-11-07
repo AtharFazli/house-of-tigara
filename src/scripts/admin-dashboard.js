@@ -213,19 +213,19 @@ function renderList() {
     return;
   }
   listEl.innerHTML = state.orders.map((order) => {
-    const stale = isStale(order.created_at);
+    const stale = order.status === 'menunggu pembayaran' && isStale(order.created_at);
     const quick = QUICK_TRANSITIONS[order.status];
     const quickPending = quick ? state.pending.has(`${order.id}:${quick}`) : false;
     return `
     <div class="admin-order${stale ? ' admin-order-stale' : ''}">
-      <button class="admin-order-main" type="button" data-order-id="${escapeHtml(order.id)}">
+      <div class="admin-order-main" role="button" tabindex="0" data-order-id="${escapeHtml(order.id)}">
         <span class="admin-order-total">${formatRupiah(order.total)}</span>
         <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
         <span class="admin-order-id">${escapeHtml(order.id)}${state.newIds.has(order.id) ? ' <span class="admin-order-new">baru</span>' : ''} <button class="admin-copy" type="button" data-copy="${escapeHtml(order.id)}" aria-label="Salin Order ID ${escapeHtml(order.id)}">${COPY_ICON}</button></span>
         <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
         <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
         <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
-      </button>
+      </div>
       ${quick ? `<div class="admin-order-actions"><button class="btn btn-primary" type="button" data-quick="${quick}" data-quick-id="${escapeHtml(order.id)}"${quickPending ? ' disabled' : ''}>${quickPending ? 'Memproses...' : actionLabel(order.status, quick)}</button></div>` : ''}
     </div>`;
   }).join('');
@@ -377,6 +377,14 @@ listEl.addEventListener('click', (event) => {
   }
   const card = event.target.closest('[data-order-id]');
   if (card) openDetail(card.dataset.orderId);
+});
+
+listEl.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const card = event.target.closest('[data-order-id]');
+  if (!card) return;
+  event.preventDefault();
+  openDetail(card.dataset.orderId);
 });
 
 detailEl.addEventListener('click', (event) => {
