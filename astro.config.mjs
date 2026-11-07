@@ -10,6 +10,7 @@ export default defineConfig({
       SUPABASE_URL: envField.string({ context: 'server', access: 'secret' }),
       SUPABASE_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
       ORDER_HASH_SECRET: envField.string({ context: 'server', access: 'secret' }),
+      SUPABASE_ANON_KEY: envField.string({ context: 'server', access: 'secret' }),
     },
   },
 });
