@@ -11,20 +11,22 @@ if (!admin) return Astro.redirect('/admin/login');
 
 <AdminLayout title="Dashboard Admin">
   <div class="admin-shell">
-    <header class="admin-header">
-      <div class="admin-header-left">
-        <span class="admin-brand">House of Tigara</span>
-        <span class="admin-role">Dashboard Admin</span>
-      </div>
-      <div class="admin-header-right">
-        <span class="admin-name">{admin.nama}</span>
-        <button class="btn btn-ghost" type="button" data-logout>Keluar</button>
-      </div>
-    </header>
+    <div class="admin-topbar">
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <span class="admin-brand">House of Tigara</span>
+          <span class="admin-role">Dashboard Admin</span>
+        </div>
+        <div class="admin-header-right">
+          <span class="admin-name">{admin.nama}</span>
+          <button class="btn btn-ghost" type="button" data-logout>Keluar</button>
+        </div>
+      </header>
+
+      <nav class="admin-tabs" data-tabs aria-label="Filter status"></nav>
+    </div>
 
     <div class="admin-banner" data-banner role="alert" hidden></div>
-
-    <nav class="admin-tabs" data-tabs aria-label="Filter status"></nav>
 
     <div class="admin-toolbar">
       <input class="admin-search" type="search" placeholder="Cari Order ID atau nama" data-search aria-label="Cari order" />
