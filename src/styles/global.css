@@ -693,14 +693,16 @@ body { padding-top: 0; }
 .admin-meta { color: var(--brown); font-size: 12px; }
 .admin-list { display: grid; gap: 8px; }
 .admin-empty { padding: 24px; color: var(--brown); text-align: center; border: 1px dashed var(--beige); border-radius: 10px; }
-.admin-order { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; width: 100%; padding: 12px 14px; text-align: left; background: #fffdf9; border: 1px solid var(--beige); border-radius: 10px; color: var(--olive); font: 400 14px var(--font-body); cursor: pointer; }
+.admin-order { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "total badge" "id id" "name name" "time time" "items items"; gap: 1px 12px; width: 100%; padding: 12px 14px; text-align: left; background: #fffdf9; border: 1px solid var(--beige); border-radius: 10px; color: var(--olive); font: 400 14px var(--font-body); cursor: pointer; }
 .admin-order:hover { border-color: var(--olive); }
 .admin-order-stale { border-color: var(--terracotta); background: var(--cream); }
 .admin-order-stale-dot { color: var(--terracotta); font-weight: 600; }
-.admin-order-id { font-weight: 700; }
-.admin-order-name { color: var(--brown); }
-.admin-order-meta { grid-column: 1; color: var(--brown); font-size: 12px; }
-.admin-badge { grid-row: 1 / span 2; grid-column: 2; align-self: center; padding: 4px 9px; border-radius: 999px; background: var(--cream); color: var(--olive); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.admin-order-total { grid-area: total; font-size: clamp(20px, 5.6vw, 26px); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.admin-order-id { grid-area: id; font-weight: 700; letter-spacing: .01em; }
+.admin-order-name { grid-area: name; color: var(--brown); }
+.admin-order-time { grid-area: time; color: var(--brown); font-size: 12px; }
+.admin-order-items { grid-area: items; color: var(--brown); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-badge { grid-area: badge; align-self: start; padding: 4px 9px; border-radius: 999px; background: var(--cream); color: var(--olive); font-size: 11px; font-weight: 600; white-space: nowrap; }
 .admin-badge-menunggu-pembayaran { background: var(--cream-2); color: var(--terracotta); }
 .admin-badge-sudah-dibayar { background: var(--beige-2); color: var(--olive); }
 .admin-badge-siap-diambil { background: var(--beige); color: var(--olive); }
@@ -731,9 +733,6 @@ body { padding-top: 0; }
 @media (min-width: 720px) {
   .admin-shell { padding: 24px; }
   .admin-detail-grid { grid-template-columns: 1fr 1fr; }
-  .admin-order { grid-template-columns: auto 1fr auto auto; align-items: center; }
-  .admin-order-id { grid-column: 1; grid-row: 1; }
-  .admin-order-name { grid-column: 2; grid-row: 1; }
-  .admin-order-meta { grid-column: 1 / span 2; grid-row: 2; }
-  .admin-badge { grid-column: 4; grid-row: 1 / span 2; }
+  .admin-order { grid-template-columns: auto 1fr auto; grid-template-areas: "total total badge" "id name time" "items items items"; align-items: center; }
+  .admin-order-total { font-size: 28px; }
 }

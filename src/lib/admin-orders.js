@@ -19,11 +19,12 @@ export async function getCounts(service) {
 }
 
 // The list never selects contact: the WhatsApp number must not reach the browser
-// until an admin opens one order.
+// until an admin opens one order. Items are embedded so each card can show a
+// one-line summary.
 export async function listOrders(service, { status = '', q = '' } = {}) {
   let query = service
     .from('orders')
-    .select('id, customer_name, total, status, created_at, updated_at, paid_at')
+    .select('id, customer_name, total, status, created_at, updated_at, paid_at, order_items(product_name, variant, quantity)')
     .order('created_at', { ascending: false })
     .limit(200);
   if (status) query = query.eq('status', status);

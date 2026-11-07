@@ -8,6 +8,7 @@ import {
   escapeHtml,
   formatRelativeTime,
   isStale,
+  summarizeItems,
 } from '../lib/admin-shared.js';
 
 const REFRESH_MS = 30000;
@@ -121,10 +122,12 @@ function renderList() {
     const stale = isStale(order.created_at);
     return `
     <button class="admin-order${stale ? ' admin-order-stale' : ''}" type="button" data-order-id="${escapeHtml(order.id)}">
+      <span class="admin-order-total">${formatRupiah(order.total)}</span>
+      <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
       <span class="admin-order-id">${escapeHtml(order.id)}</span>
       <span class="admin-order-name">${escapeHtml(order.customer_name)}</span>
-      <span class="admin-order-meta">${formatRupiah(order.total)} · ${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
-      <span class="admin-badge admin-badge-${slug(order.status)}">${order.status}</span>
+      <span class="admin-order-time">${formatRelativeTime(order.created_at)}${stale ? ' · <span class="admin-order-stale-dot">lama</span>' : ''}</span>
+      <span class="admin-order-items">${escapeHtml(summarizeItems(order.order_items))}</span>
     </button>`;
   }).join('');
 }

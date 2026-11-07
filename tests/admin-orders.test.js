@@ -10,6 +10,7 @@ import {
   isOrderOrderId,
   isStale,
   maskContact,
+  summarizeItems,
 } from '../src/lib/admin-shared.js';
 import { assertOrderId, getCounts, getRecap, listOrders, setStatus } from '../src/lib/admin-orders.js';
 
@@ -80,6 +81,18 @@ test('action guard blocks a double tap', () => {
   assert.equal(guard.isBusy('TIG-0001:sudah dibayar'), true);
   guard.end('TIG-0001:sudah dibayar');
   assert.equal(guard.begin('TIG-0001:sudah dibayar'), true);
+});
+
+test('summarizeItems flattens items into one line', () => {
+  assert.equal(
+    summarizeItems([
+      { product_name: 'Risol Mayo', variant: 'Mix', quantity: 1 },
+      { product_name: 'Coffee Bun', variant: null, quantity: 2 },
+    ]),
+    'Risol Mayo Mix x1, Coffee Bun x2'
+  );
+  assert.equal(summarizeItems([]), '');
+  assert.equal(summarizeItems(null), '');
 });
 
 test('maskContact hides the middle digits', () => {

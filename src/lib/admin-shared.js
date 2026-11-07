@@ -43,6 +43,12 @@ export function buildWaLink(contact, message) {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
+export function summarizeItems(items) {
+  return (items ?? [])
+    .map((item) => `${item.product_name}${item.variant ? ` ${item.variant}` : ''} x${item.quantity}`)
+    .join(', ');
+}
+
 export function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
