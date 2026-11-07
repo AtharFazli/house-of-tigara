@@ -226,7 +226,7 @@ export const prerender = true;
           <strong data-confirm-total>Rp 0</strong>
         </div>
         <p class="modal-note">Tunjukkan kode ini kepada panitia di booth House of Tigara.</p>
-        <a class="btn btn-primary btn-block" href={IG} target="_blank" rel="noopener" data-payment>Bayar via DM Instagram</a>
+        <a class="btn btn-primary btn-block" href={IG} target="_blank" rel="noopener" data-payment>Konfirmasi via WhatsApp</a>
         <button class="btn btn-ghost" type="button" data-action="menu">Selesai</button>
       </div>
     </div>
@@ -391,6 +391,9 @@ export const prerender = true;
         return `<p>${itemLabel(item)} <span>${formatRupiah(product?.price || 0)}</span></p>`;
       }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${PICKUP_LOCATION}</p>${pickupNotes}`;
       document.querySelector('[data-confirm-total]').textContent = formatRupiah(orderTotal);
+      const orderItems = state.cart.map((item) => `${itemLabel(item)} x${item.quantity}`).join(', ');
+      const whatsappMessage = `Halo House of Tigara, saya sudah order dan bayar. Order ID: ${result.orderId}. Nama: ${payload.name.trim()}. Pesanan: ${orderItems}. Total: Rp${orderTotal}. Mohon info jadwal dan catatan pickup.`;
+      document.querySelector('[data-payment]').href = `https://wa.me/6285723226455?text=${encodeURIComponent(whatsappMessage)}`;
       state.cart = [];
       saveCart(localStorage, state.cart);
       formElement.reset();
