@@ -44,6 +44,19 @@ export function saveCart(storage, cart) {
   storage.setItem('cart', JSON.stringify(cart));
 }
 
+// Drops anything the catalog does not recognise, so a tampered localStorage cart
+// cannot put an unknown product or variant on screen or into the order payload.
+export function sanitizeCart(cart) {
+  return (Array.isArray(cart) ? cart : []).flatMap((item) => {
+    const product = PRODUCTS.find((entry) => entry.id === item?.productId);
+    if (!product) return [];
+    if (product.variants.length) {
+      return product.variants.includes(item?.variant) ? [item] : [];
+    }
+    return [{ ...item, variant: null }];
+  });
+}
+
 export async function submitOrder(payload) {
   const response = await fetch('/api/orders', {
     method: 'POST',

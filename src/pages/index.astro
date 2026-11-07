@@ -276,7 +276,8 @@ export const prerender = true;
   </div>
 
   <script>
-    import { PRODUCTS, PICKUP_LOCATION, addItem, cartCount, cartTotal, formatRupiah, loadCart, saveCart, submitOrder, updateQuantity, validateCheckout } from '../scripts/cart.js';
+    import { PRODUCTS, PICKUP_LOCATION, addItem, cartCount, cartTotal, formatRupiah, loadCart, sanitizeCart, saveCart, submitOrder, updateQuantity, validateCheckout } from '../scripts/cart.js';
+    import { escapeHtml } from '../lib/admin-shared.js';
     import { isValidContact, buildOrderMessage } from '../lib/order-input.js';
 
     const state = { cart: loadCart(localStorage), idempotencyKey: null };
@@ -291,8 +292,9 @@ export const prerender = true;
     const itemLabel = (item) => `${productById.get(item.productId)?.name || item.productId}${item.variant ? ` · ${item.variant}` : ''}`;
 
     function render() {
-      const count = cartCount(state.cart);
-      const total = cartTotal(state.cart);
+      const cart = sanitizeCart(state.cart);
+      const count = cartCount(cart);
+      const total = cartTotal(cart);
       document.querySelectorAll('[data-count]').forEach((el) => (el.textContent = count));
       document.querySelectorAll('[data-count-bar]').forEach((el) => (el.textContent = count));
       document.querySelectorAll('[data-total]').forEach((el) => (el.textContent = formatRupiah(total)));
@@ -302,9 +304,10 @@ export const prerender = true;
       document.querySelector('[data-checkout-fields]').hidden = !count;
       document.querySelector('[data-checkout-footer]').hidden = !count;
       document.querySelector('[data-submit]').disabled = !count;
-      cartItemsEl.innerHTML = state.cart.map((item) => {
+      cartItemsEl.innerHTML = cart.map((item) => {
         const product = productById.get(item.productId);
-        return `<div class="cart-item"><img src="${product?.image || '/produk/placeholder.png'}" alt="${itemLabel(item)}" width="96" height="96" loading="lazy" /><div class="cart-item-content"><strong>${itemLabel(item)}</strong><span>${formatRupiah(product?.price || 0)}</span>${product?.pickup_only ? `<span class="pickup-note">${product.pickup_note}</span>` : ''}<div class="quantity"><button type="button" data-key="${item.key}" data-quantity="${item.quantity - 1}" aria-label="Kurangi ${itemLabel(item)}">−</button><span>${item.quantity}</span><button type="button" data-key="${item.key}" data-quantity="${item.quantity + 1}" aria-label="Tambah ${itemLabel(item)}">+</button><button type="button" data-remove="${item.key}" aria-label="Hapus ${itemLabel(item)}">Hapus</button></div></div></div>`;
+        const label = escapeHtml(itemLabel(item));
+        return `<div class="cart-item"><img src="${escapeHtml(product.image)}" alt="${label}" width="96" height="96" loading="lazy" /><div class="cart-item-content"><strong>${label}</strong><span>${formatRupiah(product.price)}</span>${product.pickup_only ? `<span class="pickup-note">${escapeHtml(product.pickup_note)}</span>` : ''}<div class="quantity"><button type="button" data-key="${escapeHtml(item.key)}" data-quantity="${item.quantity - 1}" aria-label="Kurangi ${label}">−</button><span>${item.quantity}</span><button type="button" data-key="${escapeHtml(item.key)}" data-quantity="${item.quantity + 1}" aria-label="Tambah ${label}">+</button><button type="button" data-remove="${escapeHtml(item.key)}" aria-label="Hapus ${label}">Hapus</button></div></div></div>`;
       }).join('');
     }
 
@@ -414,15 +417,16 @@ export const prerender = true;
       state.idempotencyKey = null;
       state.submitting = false;
       document.querySelector('[data-order-id]').textContent = `Order #${result.orderId}`;
-      const pickupNotes = state.cart
+      const cart = sanitizeCart(state.cart);
+      const pickupNotes = cart
         .map((item) => productById.get(item.productId))
         .filter((product) => product?.pickup_only)
-        .map((product) => `<p class="pickup-note">${product.pickup_note}</p>`)
+        .map((product) => `<p class="pickup-note">${escapeHtml(product.pickup_note)}</p>`)
         .join('');
-      document.querySelector('[data-confirm-items]').innerHTML = state.cart.map((item) => {
+      document.querySelector('[data-confirm-items]').innerHTML = cart.map((item) => {
         const product = productById.get(item.productId);
-        return `<p>${itemLabel(item)} <span>${formatRupiah(product?.price || 0)}</span></p>`;
-      }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${PICKUP_LOCATION}</p>${pickupNotes}`;
+        return `<p>${escapeHtml(itemLabel(item))} <span>${formatRupiah(product.price)}</span></p>`;
+      }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${escapeHtml(PICKUP_LOCATION)}</p>${pickupNotes}`;
       document.querySelector('[data-confirm-total]').textContent = formatRupiah(orderTotal);
       const whatsappText = encodeURIComponent(buildOrderMessage({ orderId: result.orderId, name: payload.name, items: state.cart })).replace(/\*/g, '%2A');
       document.querySelector('[data-payment]').href = `https://wa.me/6285723226455?text=${whatsappText}`;
