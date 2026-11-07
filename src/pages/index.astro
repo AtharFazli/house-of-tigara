@@ -263,7 +263,7 @@ export const prerender = true;
 
   <script>
     import { PRODUCTS, PICKUP_LOCATION, addItem, cartCount, cartTotal, formatRupiah, loadCart, saveCart, submitOrder, updateQuantity, validateCheckout } from '../scripts/cart.js';
-    import { isValidContact } from '../lib/order-input.js';
+    import { isValidContact, buildOrderMessage } from '../lib/order-input.js';
 
     const state = { cart: loadCart(localStorage), idempotencyKey: null };
     const cartItemsEl = document.querySelector('[data-cart-items]');
@@ -392,9 +392,7 @@ export const prerender = true;
         return `<p>${itemLabel(item)} <span>${formatRupiah(product?.price || 0)}</span></p>`;
       }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${PICKUP_LOCATION}</p>${pickupNotes}`;
       document.querySelector('[data-confirm-total]').textContent = formatRupiah(orderTotal);
-      const orderItems = state.cart.map((item) => `${itemLabel(item)} x${item.quantity}`).join(', ');
-      const whatsappMessage = `Halo House of Tigara, saya sudah order dan bayar. Order ID: ${result.orderId}. Nama: ${payload.name.trim()}. Pesanan: ${orderItems}. Total: Rp${orderTotal}. Mohon info jadwal dan catatan pickup.`;
-      document.querySelector('[data-payment]').href = `https://wa.me/6285723226455?text=${encodeURIComponent(whatsappMessage)}`;
+      document.querySelector('[data-payment]').href = `https://wa.me/6285723226455?text=${encodeURIComponent(buildOrderMessage({ orderId: result.orderId, name: payload.name, items: state.cart }))}`;
       state.cart = [];
       saveCart(localStorage, state.cart);
       formElement.reset();

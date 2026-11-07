@@ -13,6 +13,33 @@ export function isValidContact(value) {
   return /^628[0-9]{7,12}$/.test(normalizeContact(value));
 }
 
+export const formatRupiah = (value) => `Rp ${value.toLocaleString('id-ID')}`;
+
+export function buildOrderMessage({ orderId, name, items }) {
+  const lines = [];
+  let total = 0;
+  for (const item of items) {
+    const product = productById.get(item.productId);
+    if (!product) continue;
+    const subtotal = product.price * item.quantity;
+    total += subtotal;
+    lines.push(`${lines.length + 1}. ${product.name}${item.variant ? ` (${item.variant})` : ''} x${item.quantity} - ${formatRupiah(subtotal)}`);
+  }
+  return [
+    '*PRE-ORDER HOUSE OF TIGARA*',
+    `Order ID: ${orderId}`,
+    `Nama: ${String(name).replace(/[*_~`]/g, '').trim()}`,
+    '',
+    '*Pesanan*',
+    ...lines,
+    '',
+    `*Total: ${formatRupiah(total)}*`,
+    'Pembayaran: QRIS (sudah dibayar)',
+    '',
+    'Mohon info jadwal dan catatan pickup. Terima kasih!',
+  ].join('\n');
+}
+
 export function normalizeOrderInput(input) {
   const idempotencyKey = typeof input?.idempotencyKey === 'string' ? input.idempotencyKey : '';
   const customerName = typeof input?.name === 'string' ? input.name.trim() : '';

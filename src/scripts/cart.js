@@ -1,8 +1,7 @@
 import { PRODUCTS, PICKUP_LOCATION } from '../data/products.js';
+import { formatRupiah } from '../lib/order-input.js';
 
-export { PRODUCTS, PICKUP_LOCATION };
-
-export const formatRupiah = (value) => `Rp ${value.toLocaleString('id-ID')}`;
+export { PRODUCTS, PICKUP_LOCATION, formatRupiah };
 
 export function addItem(cart, productId, variant) {
   const key = variant ? `${productId}:${variant}` : productId;
