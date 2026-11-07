@@ -1,3 +1,4 @@
+import { PRODUCTS } from '../data/products.js';
 import { formatRupiah } from '../lib/order-input.js';
 import {
   ORDER_STATUSES,
@@ -42,6 +43,12 @@ const refreshEl = document.querySelector('[data-refresh]');
 const logoutEl = document.querySelector('[data-logout]');
 
 const guard = createActionGuard();
+const PRODUCT_ORDER = new Map(PRODUCTS.map((product, index) => [product.name, index]));
+const RECAP_STATUSES = [
+  ['sudah dibayar', 'Dibayar'],
+  ['siap diambil', 'Siap diambil'],
+  ['selesai', 'Selesai'],
+];
 let toastTimer;
 
 function toast(message, type = 'info') {
@@ -159,11 +166,14 @@ async function loadRecap() {
     const result = await response.json().catch(() => null);
     if (!response.ok || !result) return false;
     const recap = result.recap;
+    const rows = [...recap.perProduct].sort(
+      (a, b) => (PRODUCT_ORDER.get(a.product_name) ?? 99) - (PRODUCT_ORDER.get(b.product_name) ?? 99)
+    );
     recapEl.innerHTML = `
       <table class="admin-table">
         <thead><tr><th>Produk</th><th>Varian</th><th>Pcs</th><th>Rupiah</th></tr></thead>
         <tbody>
-          ${recap.perProduct.map((row) => `
+          ${rows.map((row) => `
             <tr>
               <td>${escapeHtml(row.product_name)}</td>
               <td>${escapeHtml(row.variant ?? '-')}</td>
@@ -173,8 +183,8 @@ async function loadRecap() {
         </tbody>
       </table>
       <div class="admin-recap-totals">
-        ${Object.entries(recap.perStatus).map(([status, total]) => `
-          <p><span>${status}</span><strong>${formatRupiah(total)}</strong></p>`).join('')}
+        ${RECAP_STATUSES.filter(([status]) => recap.perStatus[status]).map(([status, label]) => `
+          <p><span>${label}</span><strong>${formatRupiah(recap.perStatus[status])}</strong></p>`).join('')}
       </div>`;
     return true;
   } catch {

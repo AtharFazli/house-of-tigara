@@ -38,11 +38,11 @@ if (!admin) return Astro.redirect('/admin/login');
 
     <section class="admin-detail" data-detail hidden></section>
 
-    <section class="admin-recap">
-      <h2>Rekap</h2>
-      <p class="admin-muted">Pcs per produk dan varian untuk order berstatus sudah dibayar, siap diambil, dan selesai.</p>
+    <details class="admin-recap" data-recap-details open>
+      <summary class="admin-recap-summary">Rekap</summary>
+      <p class="admin-muted">Pcs per produk dan varian untuk order berstatus dibayar, siap diambil, dan selesai.</p>
       <div data-recap></div>
-    </section>
+    </details>
   </div>
 
   <div class="admin-toast" data-toast role="status" aria-live="polite" hidden></div>

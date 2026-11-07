@@ -753,8 +753,10 @@ body { padding-top: 0; }
 .admin-history { margin-top: 16px; }
 .admin-history p { margin: 4px 0; color: var(--brown); font-size: 13px; }
 .admin-recap { margin-top: 22px; }
-.admin-recap h2 { margin: 0 0 4px; font-size: 22px; }
-.admin-recap p { margin: 0 0 10px; font-size: 13px; }
+.admin-recap-summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; font-family: var(--font-display); font-size: 22px; color: var(--olive); }
+.admin-recap-summary::-webkit-details-marker { display: none; }
+.admin-recap-summary::after { content: "▾"; color: var(--brown); font-size: 16px; }
+.admin-recap[open] .admin-recap-summary::after { transform: rotate(180deg); }
 .admin-recap-totals { display: grid; gap: 4px; margin-top: 10px; }
 .admin-recap-totals p { display: flex; justify-content: space-between; gap: 12px; margin: 0; color: var(--olive); font-size: 14px; }
 @media (min-width: 720px) {
