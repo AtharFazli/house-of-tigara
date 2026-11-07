@@ -190,17 +190,22 @@ export const prerender = true;
         <div class="checkout-scroll">
           <p class="text-sm text-brown drawer-count"><span data-count>0</span> item</p>
           <div class="cart-items" data-cart-items></div>
-          <p class="empty" data-empty>Keranjang masih kosong. Pilih menu dulu.</p>
-          <h2 class="font-display">Checkout</h2>
-          <p class="text-xs uppercase tracking-wider text-terracotta">Lengkapi data pembeli</p>
-          <label for="name">Nama lengkap</label>
-          <input name="name" id="name" autocomplete="name" required aria-describedby="name-error" />
-          <p class="field-error" id="name-error" data-name-error role="alert"></p>
-          <label for="contact">Nomor WhatsApp</label>
-          <input name="contact" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="contact-error" />
-          <p class="field-error" id="contact-error" data-contact-error role="alert"></p>
+          <div class="empty" data-empty hidden>
+            <p>Keranjang masih kosong.</p>
+            <button class="btn btn-primary" type="button" data-action="gomenu">Lihat menu</button>
+          </div>
+          <div data-checkout-fields>
+            <h2 class="font-display">Checkout</h2>
+            <p class="text-xs uppercase tracking-wider text-terracotta">Lengkapi data pembeli</p>
+            <label for="name">Nama lengkap</label>
+            <input name="name" id="name" autocomplete="name" required aria-describedby="name-error" />
+            <p class="field-error" id="name-error" data-name-error role="alert"></p>
+            <label for="contact">Nomor WhatsApp</label>
+            <input name="contact" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="contact-error" />
+            <p class="field-error" id="contact-error" data-contact-error role="alert"></p>
+          </div>
         </div>
-        <div class="checkout-footer">
+        <div class="checkout-footer" data-checkout-footer>
           <div class="cart-total">
             <span>Total</span>
             <strong data-total>Rp 0</strong>
@@ -283,6 +288,8 @@ export const prerender = true;
       document.querySelectorAll('[data-total-bar]').forEach((el) => (el.textContent = formatRupiah(total)));
       document.querySelector('[data-cart-bar]').hidden = !count;
       document.querySelector('[data-empty]').hidden = Boolean(count);
+      document.querySelector('[data-checkout-fields]').hidden = !count;
+      document.querySelector('[data-checkout-footer]').hidden = !count;
       document.querySelector('[data-submit]').disabled = !count;
       cartItemsEl.innerHTML = state.cart.map((item) => {
         const product = productById.get(item.productId);
@@ -337,6 +344,7 @@ export const prerender = true;
         const name = action.dataset.action;
         if (name === 'cart') openDrawer();
         if (name === 'menu') { closeDrawer(); closeModal(); }
+        if (name === 'gomenu') { closeDrawer(); document.querySelector('#menu').scrollIntoView(); }
       }
     });
 

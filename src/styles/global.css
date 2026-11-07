@@ -478,6 +478,7 @@ p { text-wrap: pretty; }
 .checkout .btn[data-submit]:disabled { opacity: .5; cursor: not-allowed; }
 /* ponytail: disabled state uses dark-ivory bg + olive text (~7.5:1) so it stays readable and clearly distinct from the active olive button. */
 .checkout .btn[data-submit]:disabled { background: var(--beige); color: var(--olive); opacity: 1; border-color: var(--beige); }
+.checkout .empty .btn { width: 100%; min-height: 48px; justify-content: center; margin-top: 14px; }
 .pickup-note { margin: 8px 0 0; color: var(--terracotta); font-size: 12px; line-height: 1.5; }
 .checkout { display: flex; flex-direction: column; gap: 0; }
 .checkout label { margin-top: 16px; }
