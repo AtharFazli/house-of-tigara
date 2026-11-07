@@ -1,8 +1,6 @@
-export const PRODUCTS = [
-  { id: 'risol-mayo', name: 'Risol Mayo', description: 'Kulit renyah keemasan berpadu smoked beef gurih, telur, dan creamy mayo racikan khas Tigara.', price: 15000, unit: 'box isi 4', image: '/images/products/risol-4pcs.webp' },
-  { id: 'coffee-bun', name: 'Coffee Bun', description: 'Roti lembut beraroma kopi pekat dengan lelehan mentega gurih di dalamnya.', price: 12000, unit: 'pcs', image: '/images/products/coffee-bun.webp' },
-  { id: 'matcha', name: 'Iced Matcha Latte', description: 'Matcha dengan susu segar dan sirup vanila, disajikan dingin.', price: 16000, unit: 'cup', image: '/images/products/matcha.webp' },
-];
+import { PRODUCTS, PICKUP_LOCATION } from '../data/products.js';
+
+export { PRODUCTS, PICKUP_LOCATION };
 
 export const formatRupiah = (value) => `Rp ${value.toLocaleString('id-ID')}`;
 
@@ -28,8 +26,6 @@ export function cartTotal(cart) {
   }, 0);
 }
 
-export const PICKUP_LOCATION = 'TUJ Kampus Stasiun Bumi';
-
 export function validateCheckout({ name, contact, cart }) {
   if (!cart.length) return 'Keranjang masih kosong.';
   if (!name.trim() || !contact.trim()) return 'Isi nama dan kontak dulu.';
@@ -50,9 +46,14 @@ export function saveCart(storage, cart) {
 }
 
 export async function submitOrder(payload) {
-  // ponytail: local placeholder; replace body with Supabase insert after backend approval.
-  await Promise.resolve();
-  return { ok: true, orderId: `TIG-${String(Date.now()).slice(-4)}`, ...payload };
+  const response = await fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || 'Pesanan belum dapat disimpan. Coba lagi.');
+  return result;
 }
 
 if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {

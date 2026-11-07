@@ -265,11 +265,20 @@ p { text-wrap: pretty; }
   padding: 4px 8px;
 }
 .drawer-count { margin: 10px 20px 6px; }
-.cart-items { flex: 1; overflow-y: auto; padding: 4px 20px 12px; }
-.drawer-foot {
-  padding: 12px 20px 16px;
-  border-top: 1px solid var(--beige);
-}
+.checkout { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.checkout-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 24px 16px; }
+.cart-items { display: grid; gap: 8px; padding: 0; }
+.checkout-footer { flex: 0 0 auto; padding: 8px 24px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--beige); background: var(--bg); }
+.checkout-footer .cart-total { margin: 0 0 8px; padding: 8px 0; }
+.checkout-footer .form-error:empty { display: none; }
+.checkout-footer .btn { width: 100%; margin-top: 8px; }
+.field-error:empty { display: none; }
+.field-error { color: var(--terracotta); font-size: 12px; margin: 4px 0 8px; }
+.cart-item { min-width: 0; }
+.cart-item-content { overflow-wrap: anywhere; }
+.cart-item .pickup-note { display: block; }
+.drawer-count { margin: 0 0 8px; }
+.empty { margin: 12px 0; }
 
 /* === MODAL === */
 .modal-overlay {
@@ -416,9 +425,13 @@ p { text-wrap: pretty; }
 .quantity [data-remove] { width: auto; min-width: 44px; padding-inline: 10px; border-radius: 8px; font-size: 12px; }
 .checkout label { margin: 16px 0 7px; }
 .checkout input { display: block; }
-.checkout .btn[data-submit] { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid var(--olive); border-radius: var(--radius); background: var(--olive); color: #fff; font: 600 15px var(--font-body); }
-.checkout .btn-ghost { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; text-align: center; margin-top: 10px; border: 1px solid var(--olive); border-radius: var(--radius); background: transparent; color: var(--olive); font: 600 15px var(--font-body); }
+.checkout .btn[data-submit], .checkout .btn-ghost { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; text-align: center; margin-top: 10px; border: 1px solid var(--olive); border-radius: var(--radius); font: 600 15px var(--font-body); cursor: pointer; }
+.checkout .btn[data-submit] { background: var(--olive); color: #fff; }
+.checkout .btn[data-submit]:hover { background: var(--terracotta); border-color: var(--terracotta); }
+.checkout .btn-ghost { background: transparent; color: var(--olive); }
 .checkout .btn-ghost:hover { background: var(--olive); color: #fff; }
+.checkout .btn[data-submit]:disabled { opacity: .5; cursor: not-allowed; }
+.pickup-note { margin: 8px 0 0; color: var(--terracotta); font-size: 12px; line-height: 1.5; }
 .checkout { display: flex; flex-direction: column; gap: 0; }
 .checkout label { margin-top: 16px; }
 .quantity [data-remove] { width: auto; min-width: 44px; padding-inline: 10px; border: 1px solid var(--beige); border-radius: 8px; background: transparent; color: var(--terracotta); font-size: 12px; }
@@ -477,15 +490,26 @@ body { padding-top: 0; }
 .step-desc { margin: 0; line-height: 1.7; }
 .drawer { width: min(420px,100vw); height: 100dvh; padding-bottom: env(safe-area-inset-bottom); box-shadow: -18px 0 50px rgba(39,54,33,.14); }
 .drawer-head { padding: 18px 24px; }
-.drawer-count { margin: 12px 24px 4px; }
-.cart-items { padding: 8px 24px 16px; }
-.empty { margin-inline: 24px; }
+.checkout-scroll > .drawer-count { margin: 0 0 8px; }
+.checkout-scroll .cart-items { padding: 0; }
+.checkout-scroll > .empty { margin: 12px 0; }
 .cart-item { padding: 12px 0; border: 0; border-bottom: 1px solid var(--beige); }
 .cart-item img { width: 76px; height: 76px; }
 .quantity button { width: 44px; height: 44px; }
 .cart-total { margin: 14px 24px 18px; padding: 16px 0 0; border-color: var(--beige); }
-.checkout { flex: 0 0 auto; overflow-y: auto; max-height: 48%; padding: 18px 24px 24px; border-top: 1px solid var(--beige); }
-.checkout .btn { width: 100%; margin-top: 10px; }
+.drawer > .checkout { flex: 1 1 auto; min-height: 0; max-height: none; overflow: hidden; padding: 0; border: 0; }
+.checkout-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 24px 16px; }
+.checkout-scroll > .drawer-count { margin: 0 0 8px; }
+.checkout-scroll .cart-items { display: grid; gap: 8px; padding: 0; overflow: visible; }
+.checkout-scroll > .empty { margin: 12px 0; }
+.checkout-footer { flex: 0 0 auto; padding: 8px 24px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--beige); background: var(--bg); }
+.checkout-footer .cart-total { margin: 0 0 8px; padding: 8px 0; }
+.checkout-footer .form-error:empty, .field-error:empty { display: none; }
+.checkout-footer .btn { width: 100%; margin-top: 8px; }
+.field-error { color: var(--terracotta); font-size: 12px; margin: 4px 0 8px; }
+.cart-item { min-width: 0; }
+.cart-item-content { overflow-wrap: anywhere; }
+.cart-item .pickup-note { display: block; }
 .modal { width: min(90vw,500px); max-height: 90vh; padding: 32px; border-radius: 14px; }
 .modal .order-id { margin: 0 0 18px; font-size: 30px; font-weight: 700; }
 .confirm-summary p { display: flex; justify-content: space-between; gap: 16px; margin: 8px 0; }
@@ -549,12 +573,12 @@ body { padding-top: 0; }
   .step { padding: 22px; }
   .cart-bar:not([hidden]) { display: flex; }
   body:has(.cart-bar:not([hidden])) { padding-bottom: 72px; }
-  .drawer { top: auto; right: 0; bottom: 0; width: 100%; height: min(92dvh,780px); border-radius: 18px 18px 0 0; }
+  .drawer { top: auto; right: 0; bottom: 0; width: 100%; height: 100dvh; border-radius: 18px 18px 0 0; }
   .drawer-head { padding: 12px 18px; }
-  .drawer-count, .empty { margin-inline: 18px; }
-  .cart-items { padding-inline: 18px; }
-  .cart-total { margin-inline: 18px; }
-  .checkout { max-height: 52%; padding-inline: 18px; }
+  .checkout-scroll { padding-inline: 18px; }
+  .checkout-footer { padding-inline: 18px; }
+  .checkout-footer .cart-total { margin-inline: 0; }
+  .checkout-footer .btn { width: 100%; }
   .modal { inset: 0; width: 100%; height: 100dvh; max-height: none; display: grid; place-items: center; padding: 56px 22px 24px; transform: none; border-radius: 0; }
   .modal-body { width: 100%; }
   .footer-grid { grid-template-columns: 1fr; gap: 18px; }

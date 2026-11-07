@@ -3,7 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import { PRODUCTS, formatRupiah, PICKUP_LOCATION } from '../scripts/cart.js';
 
 const IG = 'https://www.instagram.com/houseoftigara/';
-const risol = PRODUCTS[0];
+const [risol, coffeeBun, matcha] = PRODUCTS;
+export const prerender = true;
 ---
 
 <Layout title="House of Tigara — Market Day Desember 2026">
@@ -64,12 +65,10 @@ const risol = PRODUCTS[0];
             <div class="product-copy">
               <span class="product-badge">Signature Savory</span>
               <h3>Risol Mayo</h3>
-              <p>Kulit renyah keemasan berpadu smoked beef gurih, telur, dan creamy mayo racikan khas Tigara.</p>
+              <p>{risol.description}</p>
               <fieldset class="flavor-picker">
                 <legend>Pilih rasa</legend>
-                <label><input type="radio" name="risol-flavor" value="Original" checked /> Original</label>
-                <label><input type="radio" name="risol-flavor" value="Spicy" /> Spicy</label>
-                <label><input type="radio" name="risol-flavor" value="Mix" /> Mix</label>
+                {risol.variants.map((variant, index) => <label><input type="radio" name="risol-flavor" value={variant} checked={index === 0} /> {variant}</label>)}
               </fieldset>
               <div class="product-action">
                 <span class="price">{formatRupiah(risol.price)} <small>/ box isi 4</small></span>
@@ -82,10 +81,10 @@ const risol = PRODUCTS[0];
             <img src="/images/products/coffee-bun.webp" alt="Coffee Bun" class="product-img" width="400" height="300" loading="lazy" />
             <div class="product-copy">
               <span class="product-badge">Freshly Baked</span>
-              <h3>Coffee Bun</h3>
-              <p>Roti lembut beraroma kopi pekat dengan lelehan mentega gurih di dalamnya.</p>
+              <h3>{coffeeBun.name}</h3>
+              <p>{coffeeBun.description}</p>
               <div class="product-action">
-                <span class="price">Rp 12.000 <small>/ pcs</small></span>
+                <span class="price">{formatRupiah(coffeeBun.price)} <small>/ {coffeeBun.unit}</small></span>
                 <button type="button" data-add="coffee-bun">+ Tambah</button>
               </div>
             </div>
@@ -95,10 +94,11 @@ const risol = PRODUCTS[0];
             <img src="/images/products/matcha.webp" alt="Iced Matcha Latte" class="product-img" width="400" height="300" loading="lazy" />
             <div class="product-copy">
               <span class="product-badge">Pure Matcha</span>
-              <h3>Iced Matcha Latte</h3>
-              <p>Matcha dengan susu segar dan sirup vanila, disajikan dingin.</p>
+              <h3>{matcha.name}</h3>
+              <p>{matcha.description}</p>
+              <p class="pickup-note">{matcha.pickup_note}</p>
               <div class="product-action">
-                <span class="price">Rp 16.000 <small>/ cup</small></span>
+                <span class="price">{formatRupiah(matcha.price)} <small>/ {matcha.unit}</small></span>
                 <button type="button" data-add="matcha">+ Tambah</button>
               </div>
             </div>
@@ -186,23 +186,29 @@ const risol = PRODUCTS[0];
         <h2 class="font-display drawer-title">Keranjang</h2>
         <button class="drawer-close" type="button" data-action="menu" aria-label="Tutup">✕</button>
       </div>
-      <p class="text-sm text-brown drawer-count"><span data-count>0</span> item</p>
-      <div class="cart-items" data-cart-items></div>
-      <p class="empty" data-empty>Keranjang masih kosong. Pilih menu dulu.</p>
-      <div class="cart-total">
-        <span>Total</span>
-        <strong data-total>Rp 0</strong>
-      </div>
       <form class="checkout" data-checkout>
-        <h2 class="font-display">Checkout</h2>
-        <p class="text-xs uppercase tracking-wider text-terracotta">Lengkapi data pembeli</p>
-        <label for="name">Nama lengkap</label>
-        <input name="name" id="name" autocomplete="name" required />
-        <label for="contact">Nomor WhatsApp</label>
-        <input name="contact" type="tel" inputmode="tel" autocomplete="tel" required />
-        <p class="form-error" data-error role="alert"></p>
-        <button class="btn" type="submit" data-submit>Konfirmasi pesanan</button>
-        <button class="btn btn-ghost" type="button" data-action="menu">Kembali ke menu</button>
+        <div class="checkout-scroll">
+          <p class="text-sm text-brown drawer-count"><span data-count>0</span> item</p>
+          <div class="cart-items" data-cart-items></div>
+          <p class="empty" data-empty>Keranjang masih kosong. Pilih menu dulu.</p>
+          <h2 class="font-display">Checkout</h2>
+          <p class="text-xs uppercase tracking-wider text-terracotta">Lengkapi data pembeli</p>
+          <label for="name">Nama lengkap</label>
+          <input name="name" id="name" autocomplete="name" required aria-describedby="name-error" />
+          <p class="field-error" id="name-error" data-name-error role="alert"></p>
+          <label for="contact">Nomor WhatsApp</label>
+          <input name="contact" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="contact-error" />
+          <p class="field-error" id="contact-error" data-contact-error role="alert"></p>
+        </div>
+        <div class="checkout-footer">
+          <div class="cart-total">
+            <span>Total</span>
+            <strong data-total>Rp 0</strong>
+          </div>
+          <p class="form-error" data-error role="alert"></p>
+          <button class="btn" type="submit" data-submit>Konfirmasi pesanan</button>
+          <button class="btn btn-ghost" type="button" data-action="menu">Kembali ke menu</button>
+        </div>
       </form>
     </div>
 
@@ -257,13 +263,14 @@ const risol = PRODUCTS[0];
   <script>
     import { PRODUCTS, PICKUP_LOCATION, addItem, cartCount, cartTotal, formatRupiah, loadCart, saveCart, submitOrder, updateQuantity, validateCheckout } from '../scripts/cart.js';
 
-    const state = { cart: loadCart(localStorage) };
+    const state = { cart: loadCart(localStorage), idempotencyKey: null };
     const cartItemsEl = document.querySelector('[data-cart-items]');
     const drawer = document.querySelector('[data-drawer]');
     const drawerOverlay = document.querySelector('[data-drawer-overlay]');
     const modal = document.querySelector('[data-modal]');
     const modalOverlay = document.querySelector('[data-modal-overlay]');
-    const itemLabel = (item) => `${PRODUCTS.find((product) => product.id === item.productId)?.name || item.productId}${item.variant ? ` · ${item.variant}` : ''}`;
+    const productById = new Map(PRODUCTS.map((product) => [product.id, product]));
+    const itemLabel = (item) => `${productById.get(item.productId)?.name || item.productId}${item.variant ? ` · ${item.variant}` : ''}`;
 
     function render() {
       const count = cartCount(state.cart);
@@ -276,8 +283,8 @@ const risol = PRODUCTS[0];
       document.querySelector('[data-empty]').hidden = Boolean(count);
       document.querySelector('[data-submit]').disabled = !count;
       cartItemsEl.innerHTML = state.cart.map((item) => {
-        const product = PRODUCTS.find((p) => p.id === item.productId);
-        return `<div class="cart-item"><img src="${product?.image || '/produk/placeholder.png'}" alt="${itemLabel(item)}" width="96" height="96" loading="lazy" /><div class="cart-item-content"><strong>${itemLabel(item)}</strong><span>${formatRupiah(product?.price || 0)}</span><div class="quantity"><button type="button" data-key="${item.key}" data-quantity="${item.quantity - 1}" aria-label="Kurangi ${itemLabel(item)}">−</button><span>${item.quantity}</span><button type="button" data-key="${item.key}" data-quantity="${item.quantity + 1}" aria-label="Tambah ${itemLabel(item)}">+</button><button type="button" data-remove="${item.key}" aria-label="Hapus ${itemLabel(item)}">Hapus</button></div></div></div>`;
+        const product = productById.get(item.productId);
+        return `<div class="cart-item"><img src="${product?.image || '/produk/placeholder.png'}" alt="${itemLabel(item)}" width="96" height="96" loading="lazy" /><div class="cart-item-content"><strong>${itemLabel(item)}</strong><span>${formatRupiah(product?.price || 0)}</span>${product?.pickup_only ? `<span class="pickup-note">${product.pickup_note}</span>` : ''}<div class="quantity"><button type="button" data-key="${item.key}" data-quantity="${item.quantity - 1}" aria-label="Kurangi ${itemLabel(item)}">−</button><span>${item.quantity}</span><button type="button" data-key="${item.key}" data-quantity="${item.quantity + 1}" aria-label="Tambah ${itemLabel(item)}">+</button><button type="button" data-remove="${item.key}" aria-label="Hapus ${itemLabel(item)}">Hapus</button></div></div></div>`;
       }).join('');
     }
 
@@ -333,22 +340,59 @@ const risol = PRODUCTS[0];
 
     document.querySelector('[data-checkout]').addEventListener('submit', async (event) => {
       event.preventDefault();
-      const form = new FormData(event.currentTarget);
-      const payload = { name: String(form.get('name') || ''), contact: String(form.get('contact') || ''), cart: state.cart };
-      const error = validateCheckout(payload);
-      document.querySelector('[data-error]').textContent = error;
-      if (error) return;
-      const result = await submitOrder(payload);
+      const formElement = event.currentTarget;
+      const form = new FormData(formElement);
+      const payload = {
+        name: String(form.get('name') || ''),
+        contact: String(form.get('contact') || ''),
+        items: state.cart.map(({ productId, variant, quantity }) => ({ productId, variant, quantity })),
+      };
+      const fingerprint = JSON.stringify(payload);
+      if (fingerprint !== state.checkoutFingerprint) {
+        state.checkoutFingerprint = fingerprint;
+        state.idempotencyKey = crypto.randomUUID();
+      }
+      payload.idempotencyKey = state.idempotencyKey;
+      const nameError = !payload.name.trim() ? 'Isi nama lengkap.' : '';
+      const contactError = !payload.contact.trim()
+        ? 'Isi nomor WhatsApp.'
+        : !/^\+?628?[0-9\s().-]{7,15}$/.test(payload.contact) || !/^\+?628[0-9]{7,12}$/.test(payload.contact.replace(/[\s().-]/g, ''))
+          ? 'Format nomor WhatsApp tidak valid.'
+          : '';
+      document.querySelector('[data-name-error]').textContent = nameError;
+      document.querySelector('[data-contact-error]').textContent = contactError;
+      const error = validateCheckout({ ...payload, cart: state.cart });
+      document.querySelector('[data-error]').textContent = error === 'Keranjang masih kosong.' ? error : '';
+      if (nameError || contactError || error || state.submitting) return;
+      state.submitting = true;
+      document.querySelector('[data-submit]').disabled = true;
+      state.idempotencyKey = payload.idempotencyKey;
+      let result;
+      try {
+        result = await submitOrder(payload);
+      } catch (submitError) {
+        document.querySelector('[data-error]').textContent = submitError.message;
+        state.submitting = false;
+        document.querySelector('[data-submit]').disabled = false;
+        return;
+      }
       const orderTotal = cartTotal(state.cart);
+      state.idempotencyKey = null;
+      state.submitting = false;
       document.querySelector('[data-order-id]').textContent = `Order #${result.orderId}`;
+      const pickupNotes = state.cart
+        .map((item) => productById.get(item.productId))
+        .filter((product) => product?.pickup_only)
+        .map((product) => `<p class="pickup-note">${product.pickup_note}</p>`)
+        .join('');
       document.querySelector('[data-confirm-items]').innerHTML = state.cart.map((item) => {
-        const product = PRODUCTS.find((p) => p.id === item.productId);
+        const product = productById.get(item.productId);
         return `<p>${itemLabel(item)} <span>${formatRupiah(product?.price || 0)}</span></p>`;
-      }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${PICKUP_LOCATION}</p>`;
+      }).join('') + `<p style="margin-top:8px;color:var(--terracotta)">Pickup: ${PICKUP_LOCATION}</p>${pickupNotes}`;
       document.querySelector('[data-confirm-total]').textContent = formatRupiah(orderTotal);
       state.cart = [];
       saveCart(localStorage, state.cart);
-      event.currentTarget.reset();
+      formElement.reset();
       render();
       openModal();
     });
