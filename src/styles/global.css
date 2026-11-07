@@ -307,6 +307,24 @@ p { text-wrap: pretty; }
 }
 .modal[hidden] { display: none; }
 .modal.open { display: block; }
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--olive);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-close:hover { background: var(--cream); }
 .modal .order-id { font-size: 28px; color: var(--olive); }
 .modal-note {
   margin: 18px 0 24px;
