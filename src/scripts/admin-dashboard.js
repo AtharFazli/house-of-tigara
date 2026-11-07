@@ -205,6 +205,7 @@ function renderTabs() {
     const count = tab === 'semua' ? total : (state.counts[tab] ?? 0);
     return `<button class="admin-tab${active}" type="button" data-tab="${tab}">${TAB_LABELS[tab]}<span class="admin-tab-count">${count}</span></button>`;
   }).join('');
+  updateTabFade();
 }
 
 function renderList() {
