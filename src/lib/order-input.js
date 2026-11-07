@@ -4,11 +4,19 @@ const productById = new Map(PRODUCTS.map((product) => [product.id, product]));
 
 const MAX_QUANTITY = 20;
 
+export function normalizeContact(value) {
+  const raw = typeof value === 'string' ? value.replace(/[\s()+.-]/g, '') : '';
+  return raw.startsWith('0') ? `62${raw.slice(1)}` : raw;
+}
+
+export function isValidContact(value) {
+  return /^628[0-9]{7,12}$/.test(normalizeContact(value));
+}
+
 export function normalizeOrderInput(input) {
   const idempotencyKey = typeof input?.idempotencyKey === 'string' ? input.idempotencyKey : '';
   const customerName = typeof input?.name === 'string' ? input.name.trim() : '';
-  const rawContact = typeof input?.contact === 'string' ? input.contact.replace(/[\s()+.-]/g, '') : '';
-  const contact = rawContact.startsWith('0') ? `62${rawContact.slice(1)}` : rawContact;
+  const contact = normalizeContact(input?.contact);
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idempotencyKey)
     || customerName.length < 1 || customerName.length > 120
     || !/^628[0-9]{7,12}$/.test(contact)

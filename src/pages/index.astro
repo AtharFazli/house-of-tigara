@@ -262,6 +262,7 @@ export const prerender = true;
 
   <script>
     import { PRODUCTS, PICKUP_LOCATION, addItem, cartCount, cartTotal, formatRupiah, loadCart, saveCart, submitOrder, updateQuantity, validateCheckout } from '../scripts/cart.js';
+    import { isValidContact } from '../lib/order-input.js';
 
     const state = { cart: loadCart(localStorage), idempotencyKey: null };
     const cartItemsEl = document.querySelector('[data-cart-items]');
@@ -356,7 +357,7 @@ export const prerender = true;
       const nameError = !payload.name.trim() ? 'Isi nama lengkap.' : '';
       const contactError = !payload.contact.trim()
         ? 'Isi nomor WhatsApp.'
-        : !/^\+?628?[0-9\s().-]{7,15}$/.test(payload.contact) || !/^\+?628[0-9]{7,12}$/.test(payload.contact.replace(/[\s().-]/g, ''))
+        : !isValidContact(payload.contact)
           ? 'Format nomor WhatsApp tidak valid.'
           : '';
       document.querySelector('[data-name-error]').textContent = nameError;

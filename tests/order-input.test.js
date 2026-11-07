@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeOrderInput } from '../src/lib/order-input.js';
+import { isValidContact, normalizeOrderInput } from '../src/lib/order-input.js';
 
 test('normalizes contact and derives order totals from trusted catalog', () => {
   assert.deepEqual(normalizeOrderInput({
@@ -22,4 +22,12 @@ test('rejects invalid product, variant, and quantity at server boundary', () => 
   assert.throws(() => normalizeOrderInput({ ...base, items: [{ productId: 'unknown', quantity: 1 }] }), /Isi keranjang tidak valid/);
   assert.throws(() => normalizeOrderInput({ ...base, items: [{ productId: 'risol-mayo', variant: 'Other', quantity: 1 }] }), /Isi keranjang tidak valid/);
   assert.throws(() => normalizeOrderInput({ ...base, items: [{ productId: 'coffee-bun', quantity: 21 }] }), /Isi keranjang tidak valid/);
+});
+
+test('accepts common Indonesian phone formats', () => {
+  for (const contact of ['081234567890', '0812 3456 7890', '+6281234567890', '6281234567890']) {
+    assert.equal(isValidContact(contact), true, contact);
+  }
+  assert.equal(isValidContact('0812'), false);
+  assert.equal(isValidContact('6281'), false);
 });
